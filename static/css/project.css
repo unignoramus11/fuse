@@ -1,0 +1,432 @@
+/* Capitalise project name */
+#projectName {
+  text-transform: capitalize;
+}
+
+#titleBar {
+  margin: 10px 50px 20px 50px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#projectName {
+  width: 17vw;
+  font-size: 1.3em;
+  border: none;
+  border-bottom: 0.5px solid #ccc;
+}
+
+#projectName:hover {
+  border: 0.5px solid #ccc;
+}
+
+#exportButton {
+  width: 17vw;
+}
+
+.left-subcontainer {
+  width: 17vw;
+}
+
+.rightContainer {
+  width: 17vw;
+}
+
+.upload-label {
+  font-size: 1vw;
+  color: #88799f;
+  transition: all 0.3s;
+}
+
+#file-list {
+  height: 50vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#drop-zone {
+  width: 100%;
+  height: 10vh;
+  margin-bottom: 13px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#main-container {
+  width: calc(100vw - 100px);
+  margin-left: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Highlight the drop zone when dragging over it */
+#drop-zone.dragover {
+  background-color: #f0f0f0;
+}
+
+#dialog {
+  z-index: 10;
+}
+
+/* Search */
+.libButton {
+  width: 17vw;
+}
+
+#menuButton {
+  width: 17vw;
+}
+
+.videoPreview {
+  width: 50vw;
+  /* height: 47vh; */
+}
+
+.video {
+  width: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#video {
+  width: 50vw;
+  height: 100%;
+  border-radius: 10px;
+}
+
+#seekBar {
+  width: 50vw;
+  height: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.controls {
+  padding-top: 2vh;
+  width: 17vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.controls button {
+  width: 3vh;
+  height: 3vh;
+
+  background: none;
+  border: none;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 1.7rem;
+}
+
+.bottom-container {
+  width: 96vw;
+  /* fill the remaining space in the page in terms of height */
+  /* height: 21vh; */
+  height: calc(52vh - 22vh - 2vw - 5vh);
+  margin: 2vw;
+
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  justify-content: flex-end;
+
+  overflow-x: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Hide scrollbar in Safari and Chrome on Linux */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  border-radius: 10px;
+}
+
+.timebar {
+  width: 500vw;
+  height: 20%;
+  font-size: 1.1rem;
+  background-color: #1f1a26;
+  color: black;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ruler {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-left: 6vw;
+}
+
+.image {
+  width: 500vw;
+  height: 40%;
+  background-color: #3f3351;
+  border: #1f1d36 1px solid;
+  display: flex;
+  align-items: center;
+  padding-left: 1vw;
+}
+
+.audio {
+  width: 500vw;
+  height: 40%;
+  background-color: #3f3351;
+  border: #1f1d36 1px solid;
+  display: flex;
+  align-items: center;
+  padding-left: 1vw;
+}
+
+.fa-solid {
+  color: white;
+}
+
+.fa-solid:hover {
+  color: #ccc;
+}
+
+.tickLabel {
+  color: #777;
+  font-size: 1vw;
+  width: 10vw;
+}
+
+.searchBar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.searchbutton:hover {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: #3f3351;
+}
+
+/* .searchbutton {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  background-color: transparent;
+  height: 5vh;
+  line-height: 5vh;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+} 
+
+.search-container {
+  height: 5vh;
+  width: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.mglass {
+  display: inline-block;
+  pointer-events: none;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+}
+
+.searchbutton {
+  font-size: 22px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.search:focus + .searchbutton {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: #3f3351;
+}
+
+.search {
+  position: absolute;
+  left: 49px;
+  background-color: white;
+  outline: none;
+  border: none;
+  padding: 0;
+  width: 0;
+  height: 5vh;
+  z-index: 10;
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  border-radius: 0;
+}
+
+.search:focus {
+  width: 12%;
+  padding: 0 0 0 16px;
+  right: 80%;
+}
+
+#searchimage:focus {
+  width: calc(17vw - 52px);
+  padding: 20px;
+  right: 100px;
+  border-radius: 0;
+  border-top-left-radius: 13px;
+}
+
+#searchtransition:focus {
+  width: calc(17vw - 52px);
+  padding: 20px;
+  right: 100px;
+  border-radius: 0;
+  border-top-left-radius: 10px;
+}
+
+.searchbutton:hover {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: #3f3351;
+}
+
+#searchaudio:focus {
+  width: calc(17vw - 52px);
+  padding: 20px;
+  right: 80px;
+  border-radius: 0;
+  border-top-left-radius: 10px;
+} */
+
+.form {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timeline-icon {
+  font-size: 2.5rem;
+  color: #1f1d36;
+}
+
+.timeline-icon:hover {
+  color: #1f1d36;
+}
+
+.search-container {
+  position: relative;
+  height: 50px;
+  width: 50px;
+
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mglass {
+  display: inline-block;
+  padding-top: 7px;
+  padding-right: 7px;
+  pointer-events: none;
+  color: white;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+}
+
+.mglass:active {
+  color: black;
+}
+
+.mgIcon {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.searchbutton {
+  position: absolute;
+  font-size: 22px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.search:focus + .searchbutton {
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  background-color: #3f3351;
+  color: black;
+}
+
+.search {
+  position: absolute;
+  left: 49px; /* Button width-1px (Not 50px/100% because that will sometimes show a 1px line between the search box and button) */
+  background-color: #3f3351;
+  outline: none;
+  border: none;
+  padding: 0;
+  width: 0;
+  height: 100%;
+  z-index: 10;
+  transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+}
+
+.search:focus {
+  width: calc(17vw - 50px); /* Bar width+1px */
+  padding: 0 16px 0 0;
+}
+
+.expandright {
+  left: auto;
+  right: 49px; /* Button width-1px */
+}
+
+.expandright:focus {
+  padding: 0 0 0 16px;
+}
+
+/* TODO: IMPLEMENT AUTOMATIC WIDTH FOR THE TIMELINE */

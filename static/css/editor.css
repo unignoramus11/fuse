@@ -1,0 +1,94 @@
+body {
+  background-color: #0e0e14;
+  color: white;
+}
+
+#exportButton {
+  margin-bottom: 0;
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  background: rgba(81, 81, 81, 0.47);
+}
+
+::selection {
+  background: rgba(81, 81, 81, 0.47);
+}
+
+input[type="range"] {
+  accent-color: #864879;
+}
+
+#projectName {
+  background-color: #0e0e14;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.2s;
+}
+
+#projectName:focus {
+  outline: none;
+  border: none;
+  background-color: #1f1d36;
+}
+
+#projectName:hover {
+  outline: none;
+  border: none;
+  background-color: #1f1d36;
+}
+
+#exportButton {
+  background-color: #1f1d36;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.2s;
+}
+
+#exportButton:hover {
+  background-color: #3f3351;
+  transition: all 0.2s;
+}
+
+#dd {
+  height: 50%;
+  padding-right: 10%;
+}
+
+#drop-zone {
+  border: 2px dashed #1f1d36;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10vh;
+}
+
+#drop-zone:hover {
+  border: 2px dashed #3f3351;
+  transition: all 0.2s;
+}
+
+.container-box {
+  border: 2px solid #1f1d36;
+  transition: all 0.2s;
+}
+
+.container-box:hover,
+.container-box:focus {
+  border: 2px solid #3f3351;
+}
