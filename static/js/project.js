@@ -73,16 +73,21 @@ function displayFiles(files) {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
 
-    // Create a new list item
-    var listItem = document.createElement("li");
-    listItem.textContent = file.name;
-
     // Check the file type and add it to the appropriate list
     if (file.type.startsWith("image/")) {
-      document.getElementById("image-list").appendChild(listItem);
-      listItem.classList.add("img-file");
+      var grid = document.createElement("div");
+      grid.classList.add("image-grid");
+      var img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.style.width = "100%";
+      img.alt = file.name;
+      grid.appendChild(img);
+      document.getElementById("image-grid-container").appendChild(grid);
     } else if (file.type.startsWith("audio/")) {
-      document.getElementById("audio-list").appendChild(listItem);
+      var container = document.createElement("div");
+      grid.classList.add("audio-list");
+      // make it so that the 
+      document.getElementById("audio-list").appendChild(grid);
     }
   }
 }

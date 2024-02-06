@@ -141,40 +141,7 @@
           </div>
           <div id="image-list-content" class="content">
             <!-- Photo Grid -->
-            <div class="row">
-              <div class="column">
-                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
-              </div>
-              <div class="column">
-                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
-              </div>
-              <div class="column">
-                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
-              </div>
-              <div class="column">
-                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
-                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
-              </div>
-            </div>
+            <div class="image-grid-container prevent-select" id="image-grid-container"></div>
           </div>
         </div>
       </div>
@@ -270,6 +237,20 @@
                   <span class="mglass">&#9906;</span>
                 </label>
               </form>
+            </div>
+          </div>
+          <div id="audio-list-content" class="content">
+            <!-- Audio List -->
+            <div class="audio-list-container" id="audio-list-container">
+              <div class="audio-item">
+                <audio controls>
+                  <source
+                    src="{{ url_for('static', filename='audio/1.flac') }}"
+                    type="audio/mpeg"
+                  />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
             </div>
           </div>
         </div>
