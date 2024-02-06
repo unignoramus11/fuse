@@ -80,7 +80,7 @@
       </button>
     </div>
 
-    <!-- Submit project dialog -->
+    <!-- TODO: (fix) Submit project dialog -->
     <dialog id="dialog">
       <h2>Export Project</h2>
 
@@ -106,7 +106,7 @@
     <!-- File picker -->
     <div id="main-container">
       <div class="left-subcontainer">
-        <div id="drop-zone">
+        <div id="drop-zone" class="prevent-select">
           <img
             src="{{ url_for('static', filename='/img/small-logos/drag-drop.png') }}"
             alt="Drag and Drop"
@@ -123,10 +123,11 @@
         </div>
         <div id="file-list" class="container-box">
           <div class="searchBar">
+            <div class="searchText">Images</div>
             <div class="search-container">
               <form action="/search" method="get" class="form">
                 <input
-                  class="search expandright"
+                  class="searchImage expandright"
                   id="searchright"
                   type="search"
                   name="q"
@@ -212,6 +213,8 @@
               >
             </form>
           </div>
+
+          
         </div>
         <!-- Transition Tab -->
         <div class="audio-header">Audio</div>
@@ -236,7 +239,7 @@
 
     <!-- Timeline -->
     <div class="bottom-container">
-      <div class="timebar">
+      <div class="timebar ruler-lines prevent-select">
         <div class="ruler" id="ruler"></div>
       </div>
 

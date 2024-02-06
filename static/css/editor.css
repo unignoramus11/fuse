@@ -92,3 +92,5 @@ input[type="range"] {
 .container-box:focus {
   border: 2px solid #3f3351;
 }
+
+/* TODO: IMPLEMENT AUTOMATIC WIDTH FOR THE TIMELINE */
