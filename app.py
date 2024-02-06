@@ -1,5 +1,4 @@
 from flask import Flask, redirect, url_for, render_template, request
-# import mysql.connector
 
 app = Flask(__name__)
 
@@ -10,7 +9,7 @@ def home():
 
 
 @app.route("/signin", methods=["POST", "GET"])
-def login():
+def signin():
     if request.method == "POST":
         user = request.form["name"]
         email = request.form["email"]
@@ -24,9 +23,19 @@ def login():
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
     if request.method == "POST":
-        user = request.form["name"]
+        username = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
+
+        # Create a user
+        user = {
+            "username": username,
+            "email": email,
+            "password": password
+        }
+        
+        # Add user to database
+
         return redirect(url_for("profile", usr=user))
     else:
         return render_template("sign-up.html")

@@ -3,6 +3,7 @@ import mysql.connector
 import os
 
 env = dotenv_values(".env")
+print(env)
 
 mydb = mysql.connector.connect(user=env["USER"], password=env["PASSWORD"])
 mycursor = mydb.cursor()

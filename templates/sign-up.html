@@ -49,7 +49,6 @@
   </head>
 
   <body class="">
-    
     <!-- Navbar -->
     <nav
       class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4"
@@ -85,7 +84,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link me-2" href="{{ url_for('login') }}">
+              <a class="nav-link me-2" href="{{ url_for('signin') }}">
                 <i class="fas fa-key opacity-6 me-1"></i>
                 Sign In
               </a>
@@ -157,7 +156,7 @@
                     <p class="text-sm mt-3 mb-0">
                       Already have an account?
                       <a
-                        href="{{ url_for('login') }}"
+                        href="{{ url_for('signin') }}"
                         class="text-dark font-weight-bolder"
                         >Sign in</a
                       >

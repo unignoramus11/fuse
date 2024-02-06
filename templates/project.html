@@ -67,7 +67,7 @@
         type="text"
         name="projectName"
         id="projectName"
-        placeholder="New Project #1"
+        placeholder="Loading..."
       />
 
       <!-- Export button -->
@@ -121,7 +121,7 @@
           />
           <div class="upload-label">Click or drop here to upload</div>
         </div>
-        <div id="file-list" class="container-box">
+        <div id="image-list" class="container-box">
           <div class="searchBar">
             <div class="searchText">Images</div>
             <div class="search-container">
@@ -137,6 +137,43 @@
                   <span class="mglass">&#9906;</span>
                 </label>
               </form>
+            </div>
+          </div>
+          <div id="image-list-content" class="content">
+            <!-- Photo Grid -->
+            <div class="row">
+              <div class="column">
+                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
+              </div>
+              <div class="column">
+                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
+              </div>
+              <div class="column">
+                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
+              </div>
+              <div class="column">
+                <img src="{{ url_for('static', filename='/img/curved-images/curved1.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved2.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved3.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved4.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved5.jpg') }}" style="width: 100%" />
+                <img src="{{ url_for('static', filename='/img/curved-images/curved6.jpg') }}" style="width: 100%" />
+              </div>
             </div>
           </div>
         </div>
@@ -196,42 +233,44 @@
 
       <!-- On-site libraries for transition and audio -->
       <div class="rightContainer">
-        <!-- Audio Tab -->
-        <div class="transitions-header">Transitions</div>
-        <div class="inBuilt">
-          <div class="search-container">
-            <form action="/search" method="get">
-              <input
-                class="search"
-                id="searchtransition"
-                type="search"
-                name="image"
-                placeholder="Search images"
-              />
-              <label class="searchbutton" for="searchtransition"
-                ><span class="mglass">&#9906;</span></label
-              >
-            </form>
+        <!-- Transitions Tab -->
+        <div id="transition-list" class="inBuilt">
+          <div class="searchBar">
+            <div class="searchText">Transitions</div>
+            <div class="search-container">
+              <form action="/search" method="get" class="form">
+                <input
+                  class="searchTransition expandright"
+                  id="searchright1"
+                  type="search"
+                  name="q"
+                  placeholder="Search"
+                />
+                <label class="button searchbutton mgIcon" for="searchright1">
+                  <span class="mglass">&#9906;</span>
+                </label>
+              </form>
+            </div>
           </div>
-
-          
         </div>
-        <!-- Transition Tab -->
-        <div class="audio-header">Audio</div>
-        <div class="inBuilt" style="height: 300px">
-          <div class="search-container">
-            <form action="/search" method="get">
-              <input
-                class="search"
-                id="searchaudio"
-                type="search"
-                name="image"
-                placeholder="Search"
-              />
-              <label class="searchbutton" for="searchaudio"
-                ><span class="mglass">&#9906;</span></label
-              >
-            </form>
+        <!-- Audio Tab -->
+        <div id="audio-list" class="inBuilt">
+          <div class="searchBar">
+            <div class="searchText">Audio</div>
+            <div class="search-container">
+              <form action="/search" method="get" class="form">
+                <input
+                  class="searchAudio expandright"
+                  id="searchright2"
+                  type="search"
+                  name="q"
+                  placeholder="Search"
+                />
+                <label class="button searchbutton mgIcon" for="searchright2">
+                  <span class="mglass">&#9906;</span>
+                </label>
+              </form>
+            </div>
           </div>
         </div>
       </div>

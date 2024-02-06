@@ -1,5 +1,4 @@
 // Set a random project name with an adjective and an animal
-
 var projectInput = document.getElementById("projectName");
 projectInput.placeholder = "Loading...";
 fetch("https://random-word-form.herokuapp.com/random/adjective")
@@ -36,12 +35,10 @@ for (var i = 0; i < searchInput.length; i++) {
 var searchInput = document.getElementById("search");
 var searchIcon = document.getElementById("searchicon");
 
-
 // Drag and drop support
-
 var dropZone = document.getElementById("drop-zone");
 var fileInput = document.getElementById("docpicker");
-var fileList = document.getElementById("file-list");
+var fileList = document.getElementById("image-list");
 
 dropZone.addEventListener("dragover", function (e) {
   e.preventDefault();
@@ -70,16 +67,27 @@ dropZone.addEventListener("click", function () {
   fileInput.click();
 });
 
+// Sorting images and audio in their respective boxes
 function displayFiles(files) {
+  // Iterate over the files
   for (var i = 0; i < files.length; i++) {
-    var fileItem = document.createElement("div");
-    fileItem.textContent = `File Name: ${files[i].name}, Size: ${files[i].size} bytes`;
-    fileList.appendChild(fileItem);
+    var file = files[i];
+
+    // Create a new list item
+    var listItem = document.createElement("li");
+    listItem.textContent = file.name;
+
+    // Check the file type and add it to the appropriate list
+    if (file.type.startsWith("image/")) {
+      document.getElementById("image-list").appendChild(listItem);
+      listItem.classList.add("img-file");
+    } else if (file.type.startsWith("audio/")) {
+      document.getElementById("audio-list").appendChild(listItem);
+    }
   }
 }
 
 // Submit project for processing
-
 function exportProject() {
   // Open a custom dialog box to confirm the project name
 
@@ -105,7 +113,7 @@ function exportProject() {
 }
 
 function generateRuler() {
-  const duration = 500;
+  const duration = 300;
 
   // Clear the ruler container
   const rulerContainer = document.getElementById("ruler");
@@ -116,8 +124,14 @@ function generateRuler() {
     const tickLabel = document.createElement("div");
     tickLabel.className = "tickLabel";
     tickLabel.textContent = `${i}s`;
-
     rulerContainer.appendChild(tickLabel);
+
+    for (let j = 0; j < 4; j += 1) {
+      const tickLabel = document.createElement("div");
+      tickLabel.className = "tickLabel";
+      tickLabel.textContent = ` | `;
+      rulerContainer.appendChild(tickLabel);
+    }
   }
 }
 

@@ -356,8 +356,8 @@
       <nav class="desktop">
         <div>
           <ul>
-            <li><a href="login"> Sign In </a></li>
-            <li><a href="signup"> Sign Up </a></li>
+            <li><a href="{{ url_for('signin') }}"> Sign In </a></li>
+            <li><a href="{{ url_for('signup') }}"> Sign Up </a></li>
           </ul>
         </div>
       </nav>
@@ -381,7 +381,7 @@
         </div>
         <div class="mobile">
           <ul style="display: flex; gap: min(10px, 1vw); align-items: center">
-            <li><a href="login"> Sign In </a></li>
+            <li><a href="{{ url_for('signin') }}"> Sign In </a></li>
             <li><a href="signup"> Sign Up </a></li>
           </ul>
         </div>
