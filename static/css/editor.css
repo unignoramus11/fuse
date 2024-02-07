@@ -8,9 +8,12 @@ body {
 }
 
 .prevent-select {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10 and IE 11 */
+  user-select: none;
+  /* Standard syntax */
 }
 
 ::-moz-selection {
@@ -96,9 +99,11 @@ input[type="range"] {
 /* Image grid formatting */
 
 .image-grid-container {
-  display: -ms-flexbox; /* IE10 */
+  display: -ms-flexbox;
+  /* IE10 */
   display: flex;
-  -ms-flex-wrap: wrap; /* IE10 */
+  -ms-flex-wrap: wrap;
+  /* IE10 */
   flex-wrap: wrap;
   padding: 15px;
   padding-top: 0;
@@ -135,4 +140,210 @@ input[type="range"] {
     flex: 100%;
     max-width: 100%;
   }
+}
+
+/* Video glow effect */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.canvas,
+.canvas-low {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  transition: all 0.5s;
+}
+
+.wrapper {
+  box-shadow: inset 0 0 4rem 4.5rem var(--color-background);
+  max-width: 1600px;
+  transition: all 0.5s;
+}
+
+.canvas,
+.canvas-low {
+  position: absolute;
+  /* make this at center of screen */
+  top: 36%;
+  left: 50%;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  width: 52.5vw;
+
+  /* calculate the height of video */
+  height: calc(60vw * 0.5625);
+
+  opacity: 0.2;
+  border-radius: 20px;
+
+  /* make it blurred and add some bleeding */
+  filter: blur(20px);
+}
+
+.canvas-low {
+  opacity: 0.05;
+  filter: blur(40px);
+  z-index: -2;
+  width: 65vw;
+  height: calc(75vw * 0.5625);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .canvas,
+  .canvas-low {
+    display: none !important;
+  }
+}
+
+.dialog-container {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  transition: all 0.2s;
+}
+
+#dialog {
+  border-radius: 20px;
+  background-color: #E9A6A6;
+  /* blur everything behind this */
+  backdrop-filter: blur(20px);
+  text-align: center;
+  transition: all 0.2s;
+  padding: 20px;
+  padding-left: 50px;
+  padding-right: 50px;
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-container h2 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  color: #1f1d36;
+}
+
+.dialog-container p {
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  color: #1f1d36;
+}
+
+.dialog-container button {
+  margin: 20px;
+  padding: 10px;
+  /* set the height as the maximum of fit content and 5vh */
+  height: max(5vh, fit-content);
+  width: max(10vw, fit-content);
+  border: none;
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  transition: all 0.2s;
+}
+
+.dialog-container button:hover {
+  background-color: #3f3351;
+  transition: all 0.2s;
+}
+
+.dialog-container button:active {
+  background-color: #864879;
+  transition: all 0.2s;
+}
+
+.dialog-container menu {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 0;
+  padding: 0;
+}
+
+.dialog-container select {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #3f3351;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+}
+
+.dialog-container select:hover {
+  background-color: #1f1d36;
+  transition: all 0.2s;
+}
+
+.dialog-container label {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #1f1d36;
+}
+
+#heightRes,
+#widthRes {
+  width: 100px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #864879;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+  margin: 10px;
+}
+
+#heightRes::placeholder,
+#widthRes::placeholder {
+  color: rgb(200, 200, 200);
+}
+
+.audio-list-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  padding-top: 0;
+  padding-bottom: 20px;
+}
+
+.audio-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #1f1d36;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+
+.audio-item:hover {
+  background-color: #3f3351;
+  transition: all 0.2s;
+}
+
+.audio-item p {
+  color: white;
+  margin: 0;
 }

@@ -238,9 +238,12 @@
   height: 5vh;
   display: flex;
   justify-content: flex-end;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10 and IE 11 */
+  user-select: none;
+  /* Standard syntax */
 }
 
 .searchbutton:hover {
@@ -299,9 +302,9 @@
   transition: all 0.8s;
 }
 
-.searchImage:focus + .searchbutton,
-.searchTransition:focus + .searchbutton,
-.searchAudio:focus + .searchbutton {
+.searchImage:focus+.searchbutton,
+.searchTransition:focus+.searchbutton,
+.searchAudio:focus+.searchbutton {
   transition-duration: 0.4s;
   -moz-transition-duration: 0.4s;
   -webkit-transition-duration: 0.4s;
@@ -361,6 +364,7 @@
   border: 2px solid #1f1d36;
 }
 
+/* Audio */
 #audio-list {
   height: 37vh;
   overflow-y: auto;
@@ -368,4 +372,39 @@
   text-align: center;
   margin-top: 20px;
   border: 2px solid #1f1d36;
+}
+
+.audio-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+audio {
+  width: 50vw;
+  height: 7vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  margin-top: 20px;
+}
+
+.play-button {
+  width: 3vh;
+  height: 3vh;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
 }

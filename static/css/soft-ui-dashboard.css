@@ -647,12 +647,21 @@ progress {
 .container-xl,
 .container-xxl {
   --bs-gutter-x: 1.5rem;
-  --bs-gutter-y: 0;
   width: 100%;
-  padding-right: calc(var(--bs-gutter-x) * .5);
-  padding-left: calc(var(--bs-gutter-x) * .5);
-  margin-right: auto;
-  margin-left: auto;
+  padding-right: 1vw;
+  padding-left: 1vw;
+}
+
+.project-list {
+  --bs-gutter-x: 1.5rem;
+  width: 97.6vw;
+  margin-right: 1.2vw;
+  margin-left: 1.2vw;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+
+  background-color: white;
+  border-radius: 19px;
 }
 
 @media (min-width: 576px) {
@@ -4677,12 +4686,14 @@ fieldset:disabled .btn {
   --bs-navbar-toggler-border-radius: 0.5rem;
   --bs-navbar-toggler-focus-width: 0.2rem;
   --bs-navbar-toggler-transition: box-shadow 0.15s ease-in-out;
+  
+  z-index: 3;
   position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
+  padding: 1vh 1vw 1vh 1vw;
 }
 
 .navbar>.container,
@@ -5369,6 +5380,19 @@ fieldset:disabled .btn {
   --bs-accordion-body-padding-y: 1rem;
   --bs-accordion-active-color: #344767;
   --bs-accordion-active-bg: transparent;
+}
+
+.newProjectCard {
+  height: calc(max(123px, 72.5%));
+  width: 100%;
+  border: 1px dashed grey;
+  border-radius: 13px;
+  margin-bottom: 37px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .accordion-button {

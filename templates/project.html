@@ -1,283 +1,207 @@
 <!DOCTYPE html>
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='/img/favicon.ico') }}"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="{{ url_for('static', filename='/img/apple-icon.png') }}"
-    />
 
-    <title>New Project</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='/img/favicon.ico') }}" />
+  <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='/img/apple-icon.png') }}" />
 
-    <link
-      href="{{ url_for('static', filename='/css/nucleo-svg.css') }}"
-      rel="stylesheet"
-    />
-    <link
-      href="{{ url_for('static', filename='/css/nucleo-svg.css') }}"
-      rel="stylesheet"
-    />
-    <link
-      href="{{ url_for('static', filename='/css/nucleo-icons.css') }}"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
-      rel="stylesheet"
-    />
-    <link
-      id="pagestyle"
-      href="{{ url_for('static', filename='/css/soft-ui-dashboard.css') }}"
-      rel="stylesheet"
-    />
+  <title>New Project</title>
 
-    <link
-      id="pagestyle"
-      href="{{ url_for('static', filename='/css/project.css') }}"
-      rel="stylesheet"
-    />
+  <link href="{{ url_for('static', filename='/css/nucleo-svg.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='/css/nucleo-svg.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='/css/nucleo-icons.css') }}" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <link id="pagestyle" href="{{ url_for('static', filename='/css/soft-ui-dashboard.css') }}" rel="stylesheet" />
 
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      rel="stylesheet"
-      crossorigin="anonymous"
-    />
+  <link id="pagestyle" href="{{ url_for('static', filename='/css/project.css') }}" rel="stylesheet" />
 
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='/css/editor.css') }}"
-    />
-  </head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"
+    crossorigin="anonymous" />
 
-  <body>
-    <div id="titleBar" class="flex">
-      <!-- Project Name -->
-      <input
-        type="text"
-        name="projectName"
-        id="projectName"
-        placeholder="Loading..."
-      />
+  <link rel="stylesheet" href="{{ url_for('static', filename='/css/editor.css') }}" />
+</head>
 
-      <!-- Export button -->
-      <button
-        class="btn btn-primary"
-        id="exportButton"
-        onclick="exportProject()"
-      >
-        Export
-      </button>
-    </div>
+<body>
+  <div id="titleBar" class="flex">
+    <!-- Project Name -->
+    <input type="text" name="projectName" id="projectName" placeholder="Loading..." />
 
-    <!-- TODO: (fix) Submit project dialog -->
+    <!-- Export button -->
+    <button class="btn btn-primary" id="exportButton" onclick="exportProject()">
+      Export
+    </button>
+  </div>
+
+  <!-- TODO: (fix) Submit project dialog -->
+  <div class="dialog-container" id="dialog-container">
     <dialog id="dialog">
       <h2>Export Project</h2>
-
       <p>Are you sure you want to send this video for processing?</p>
-
       <label for="exportFormat">Export Format:</label>
       <select id="exportFormat" name="exportFormat">
-        <option value="mp4">MP4</option>
-        <option value="mkv">MKV</option>
-        <option value="gif">AVI</option>
-        <option value="mov">MOV</option>
-        <option value="webm">WEBM</option>
+        <option value="mp4"> MP4 </option>
+        <option value="mkv"> MKV </option>
+        <option value="gif"> AVI </option>
+        <option value="mov"> MOV </option>
+        <option value="webm"> WEBM </option>
       </select>
-
       <label for="resolution">Export Resolution:</label>
-      <input type="text" id="resolution" name="resolution" />
+      <select id="resolution" onchange="showResolution()">
+        <option value="360p"> 360p </option>
+        <option value="480p"> 480p </option>
+        <option value="720p"> 720p </option>
+        <option value="1080p"> 1080p </option>
+        <option value="2160p"> 2160p </option>
+        <option value="Custom"> Custom </option>
+      </select>
+      <div id="Custom" class="hidden">
+        <p> 
+          Height: <input type="number" id="heightRes" name="heightRes" placeholder="in pixels">
+          Width: <input type="number" id="widthRes" name="widthRes" placeholder="in pixels">
+        </p>
+      </div>
       <menu>
         <button class="close">Cancel</button>
         <button class="confirm">Confirm</button>
       </menu>
     </dialog>
+  </div>
 
-    <!-- File picker -->
-    <div id="main-container">
-      <div class="left-subcontainer">
-        <div id="drop-zone" class="prevent-select">
-          <img
-            src="{{ url_for('static', filename='/img/small-logos/drag-drop.png') }}"
-            alt="Drag and Drop"
-            id="dd"
-          />
-          <input
-            type="file"
-            id="docpicker"
-            accept="image/*, audio/*"
-            multiple
-            style="display: none"
-          />
-          <div class="upload-label">Click or drop here to upload</div>
-        </div>
-        <div id="image-list" class="container-box">
-          <div class="searchBar">
-            <div class="searchText">Images</div>
-            <div class="search-container">
-              <form action="/search" method="get" class="form">
-                <input
-                  class="searchImage expandright"
-                  id="searchright"
-                  type="search"
-                  name="q"
-                  placeholder="Search"
-                />
-                <label class="button searchbutton mgIcon" for="searchright">
-                  <span class="mglass">&#9906;</span>
-                </label>
-              </form>
-            </div>
-          </div>
-          <div id="image-list-content" class="content">
-            <!-- Photo Grid -->
-            <div class="image-grid-container prevent-select" id="image-grid-container"></div>
-          </div>
-        </div>
+  <!-- File picker -->
+  <div id="main-container">
+    <div class="left-subcontainer">
+      <div id="drop-zone" class="prevent-select">
+        <img src="{{ url_for('static', filename='/img/small-logos/drag-drop.png') }}" alt="Drag and Drop" id="dd" />
+        <input type="file" id="docpicker" accept="image/*, audio/*" multiple style="display: none" />
+        <div class="upload-label">Click or drop here to upload</div>
       </div>
-
-      <!-- Video preview -->
-
-      <div class="video">
-        <!-- Video -->
-        <div class="videoPreview">
-          <video id="video">
-            <source
-              src="{{ url_for('static', filename='preview/videow.mp4')}}"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        <input
-          type="range"
-          id="seekBar"
-          value="0"
-          min="0"
-          max="100"
-          step="1"
-          oninput="seek()"
-        />
-
-        <!-- Video player controls -->
-        <div class="controls">
-          <!-- Play from start button -->
-          <button id="fromStartButton" onclick="fromStart()">
-            <i class="fa-solid fa-backward-step"></i>
-          </button>
-          <!-- Rewind back 5 seconds -->
-          <button id="rewindButton" onclick="rewind()">
-            <i class="fa-solid fa-backward"></i>
-          </button>
-
-          <!-- Pause Play -->
-          <button id="playButton" onclick="playPause()">
-            <i class="fa-solid fa-play"></i>
-          </button>
-
-          <!-- Forward 5 seconds -->
-          <button id="forwardButton" onclick="forward()">
-            <i class="fa-solid fa-forward"></i>
-          </button>
-
-          <!-- Finish video -->
-          <button id="toEndButton" onclick="toEnd()">
-            <i class="fa-solid fa-forward-step"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- On-site libraries for transition and audio -->
-      <div class="rightContainer">
-        <!-- Transitions Tab -->
-        <div id="transition-list" class="inBuilt">
-          <div class="searchBar">
-            <div class="searchText">Transitions</div>
-            <div class="search-container">
-              <form action="/search" method="get" class="form">
-                <input
-                  class="searchTransition expandright"
-                  id="searchright1"
-                  type="search"
-                  name="q"
-                  placeholder="Search"
-                />
-                <label class="button searchbutton mgIcon" for="searchright1">
-                  <span class="mglass">&#9906;</span>
-                </label>
-              </form>
-            </div>
+      <div id="image-list" class="container-box">
+        <div class="searchBar">
+          <div class="searchText">Images</div>
+          <div class="search-container">
+            <form action="/search" method="get" class="form">
+              <input class="searchImage expandright" id="searchright" type="search" name="q" placeholder="Search" />
+              <label class="button searchbutton mgIcon" for="searchright">
+                <span class="mglass">&#9906;</span>
+              </label>
+            </form>
           </div>
         </div>
-        <!-- Audio Tab -->
-        <div id="audio-list" class="inBuilt">
-          <div class="searchBar">
-            <div class="searchText">Audio</div>
-            <div class="search-container">
-              <form action="/search" method="get" class="form">
-                <input
-                  class="searchAudio expandright"
-                  id="searchright2"
-                  type="search"
-                  name="q"
-                  placeholder="Search"
-                />
-                <label class="button searchbutton mgIcon" for="searchright2">
-                  <span class="mglass">&#9906;</span>
-                </label>
-              </form>
-            </div>
-          </div>
-          <div id="audio-list-content" class="content">
-            <!-- Audio List -->
-            <div class="audio-list-container" id="audio-list-container">
-              <div class="audio-item">
-                <audio controls>
-                  <source
-                    src="{{ url_for('static', filename='audio/1.flac') }}"
-                    type="audio/mpeg"
-                  />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            </div>
-          </div>
+        <div id="image-list-content" class="content">
+          <!-- Photo Grid -->
+          <div class="image-grid-container prevent-select" id="image-grid-container"></div>
         </div>
       </div>
     </div>
 
-    <!-- Timeline -->
-    <div class="bottom-container">
-      <div class="timebar ruler-lines prevent-select">
-        <div class="ruler" id="ruler"></div>
+    <!-- Video preview -->
+
+    <div class="video">
+      <!-- Video -->
+      <div class="videoPreview wrapper">
+        <video id="video">
+          <source src="{{ url_for('static', filename='preview/videow.mp4')}}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <canvas width="10" height="6" aria-hidden="true" class="canvas" id="js-canvas"></canvas>
+        <canvas width="10" height="6" aria-hidden="true" class="canvas-low" id="js-canvas-low"></canvas>
       </div>
 
-      <div class="image">
-        <div id="imgIcon">
-          <i class="fa-solid fa-file-image timeline-icon"></i>
-        </div>
-        <div id="imgContent"></div>
-      </div>
+      <input type="range" id="seekBar" value="0" min="0" max="100" step="1" oninput="seek()" />
 
-      <div class="audio">
-        <div id="audIcon">
-          <i class="fa-regular fa-file-audio timeline-icon"></i>
-        </div>
-        <div id="audContent"></div>
+      <!-- Video player controls -->
+      <div class="controls">
+        <!-- Play from start button -->
+        <button id="fromStartButton" onclick="fromStart()">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <!-- Rewind back 5 seconds -->
+        <button id="rewindButton" onclick="rewind()">
+          <i class="fa-solid fa-backward"></i>
+        </button>
+
+        <!-- Pause Play -->
+        <button id="playButton" onclick="playPause()">
+          <i class="fa-solid fa-play"></i>
+        </button>
+
+        <!-- Forward 5 seconds -->
+        <button id="forwardButton" onclick="forward()">
+          <i class="fa-solid fa-forward"></i>
+        </button>
+
+        <!-- Finish video -->
+        <button id="toEndButton" onclick="toEnd()">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/project.js') }}"></script>
-  </body>
+    <!-- On-site libraries for transition and audio -->
+    <div class="rightContainer">
+      <!-- Transitions Tab -->
+      <div id="transition-list" class="inBuilt">
+        <div class="searchBar">
+          <div class="searchText">Transitions</div>
+          <div class="search-container">
+            <form action="/search" method="get" class="form">
+              <input class="searchTransition expandright" id="searchright1" type="search" name="q"
+                placeholder="Search" />
+              <label class="button searchbutton mgIcon" for="searchright1">
+                <span class="mglass">&#9906;</span>
+              </label>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Audio Tab -->
+      <div id="audio-list" class="inBuilt">
+        <div class="searchBar">
+          <div class="searchText">Audio</div>
+          <div class="search-container">
+            <form action="/search" method="get" class="form">
+              <input class="searchAudio expandright" id="searchright2" type="search" name="q" placeholder="Search" />
+              <label class="button searchbutton mgIcon" for="searchright2">
+                <span class="mglass">&#9906;</span>
+              </label>
+            </form>
+          </div>
+        </div>
+        <div id="audio-list-content" class="content">
+          <!-- Audio List -->
+          <div class="audio-list-container" id="audio-list-container">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="bottom-container">
+    <div class="timebar ruler-lines prevent-select">
+      <div class="ruler" id="ruler"></div>
+    </div>
+
+    <div class="image">
+      <div id="imgIcon">
+        <i class="fa-solid fa-file-image timeline-icon"></i>
+      </div>
+      <div id="imgContent"></div>
+    </div>
+
+    <div class="audio">
+      <div id="audIcon">
+        <i class="fa-regular fa-file-audio timeline-icon"></i>
+      </div>
+      <div id="audContent"></div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/project.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/video-glow.js') }}"></script>
+</body>
+
 </html>

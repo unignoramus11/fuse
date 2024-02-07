@@ -11,9 +11,11 @@ def home():
 @app.route("/signin", methods=["POST", "GET"])
 def signin():
     if request.method == "POST":
-        user = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
+
+        # Fetch user from database
+        user = email
 
         return redirect(url_for("profile", usr=user))
     else:
@@ -23,17 +25,13 @@ def signin():
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
     if request.method == "POST":
-        username = request.form["name"]
+        name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
 
         # Create a user
-        user = {
-            "username": username,
-            "email": email,
-            "password": password
-        }
-        
+        user = {"name": name, "email": email, "password": password}
+
         # Add user to database
 
         return redirect(url_for("profile", usr=user))

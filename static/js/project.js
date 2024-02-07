@@ -1,5 +1,5 @@
 // Set a random project name with an adjective and an animal
-var projectInput = document.getElementById("projectName");
+let projectInput = document.getElementById("projectName");
 projectInput.placeholder = "Loading...";
 fetch("https://random-word-form.herokuapp.com/random/adjective")
   .then((response) => response.json())
@@ -18,8 +18,8 @@ projectInput.addEventListener("input", function () {
 });
 
 // Change the search icon color when the input is focused for all the search boxes
-var searchInput = document.getElementsByClassName("searchbutton");
-var searchIcon = document.getElementsByClassName("mglass");
+let searchInput = document.getElementsByClassName("searchbutton");
+let searchIcon = document.getElementsByClassName("mglass");
 
 for (var i = 0; i < searchInput.length; i++) {
   searchInput[i].addEventListener("focus", function () {
@@ -31,14 +31,10 @@ for (var i = 0; i < searchInput.length; i++) {
   });
 }
 
-// Change the color of the search icon when the input is focused
-var searchInput = document.getElementById("search");
-var searchIcon = document.getElementById("searchicon");
-
 // Drag and drop support
-var dropZone = document.getElementById("drop-zone");
-var fileInput = document.getElementById("docpicker");
-var fileList = document.getElementById("image-list");
+let dropZone = document.getElementById("drop-zone");
+let fileInput = document.getElementById("docpicker");
+let fileList = document.getElementById("image-list");
 
 dropZone.addEventListener("dragover", function (e) {
   e.preventDefault();
@@ -73,34 +69,87 @@ function displayFiles(files) {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
 
-    // Check the file type and add it to the appropriate list
+    // Check the file type and add it to the appropriate place
     if (file.type.startsWith("image/")) {
+      // Create a new image grid
       var grid = document.createElement("div");
       grid.classList.add("image-grid");
+      // Create a new image element
       var img = document.createElement("img");
+      // Set the image source and alt attributes
       img.src = URL.createObjectURL(file);
       img.style.width = "100%";
       img.alt = file.name;
+      // Append the image to the grid
       grid.appendChild(img);
       document.getElementById("image-grid-container").appendChild(grid);
-    } else if (file.type.startsWith("audio/")) {
-      var container = document.createElement("div");
-      grid.classList.add("audio-list");
-      // make it so that the 
-      document.getElementById("audio-list").appendChild(grid);
+    }
+
+    else if (file.type.startsWith("audio/")) {
+      // Get the audio list container
+      audioListContainer = document.getElementById("audio-list-container");
+      let audioItem = document.createElement("div");
+      audioItem.classList.add("audio-item");
+      let audio = document.createElement("audio");
+      audio.src = URL.createObjectURL(file);
+      audio.alt = file.name;
+
+      // Show the file name beside the audio
+      let audioName = document.createElement("p");
+      audioName.textContent = file.name;
+      audioItem.appendChild(audioName);
+
+      // Custom audio controls
+      let audioControls = document.createElement("div");
+      audioControls.classList.add("audio-controls");
+      let playButton = document.createElement("button");
+      playButton.type = "button";
+      playButton.classList.add("play-button");
+      playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+
+      playButton.addEventListener("click", function () {
+        if (audio.paused) {
+          audio.play();
+          // Change it into play button
+          playButton.innerHTML = '<i class="fas fa-pause" style="color: white;"></i>';
+        } else {
+          audio.pause();
+          // Change it into pause button
+          playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+        }
+      }
+      );
+
+      // Change to play button when the audio ends
+      audio.addEventListener("ended", function () {
+        playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+      });
+
+      audioControls.appendChild(playButton);
+      audioItem.appendChild(audioControls);
+
+      // Append the audio to the audio list container
+      audioListContainer.appendChild(audioItem);
+      audioItem.appendChild(audio);
+
     }
   }
 }
 
+
 // Submit project for processing
 function exportProject() {
   // Open a custom dialog box to confirm the project name
+
+  var dialog_container = document.getElementById("dialog-container");
+  dialog_container.setAttribute("style", "display: block;");
 
   var dialog = document.getElementById("dialog");
   dialog.showModal();
 
   dialog.querySelector(".close").addEventListener("click", () => {
     dialog.close();
+    dialog_container.setAttribute("style", "display: none;");
   });
 
   dialog.querySelector(".confirm").addEventListener("click", () => {
@@ -111,12 +160,14 @@ function exportProject() {
 
   var resolution = document.getElementById("resolution");
 
-  // Send the project to the server for processing
+  // TODO: Send the project to the server for processing
 
   var projectName = projectInput.value;
   var exportResolution = resolution.value;
+  showResolution();
 }
 
+// Generate the seconds labels for the timeline
 function generateRuler() {
   const duration = 300;
 
@@ -138,6 +189,86 @@ function generateRuler() {
       rulerContainer.appendChild(tickLabel);
     }
   }
+}
+
+// Make the video controls work
+let video = document.getElementById("video");
+let playButton = document.getElementById("playButton");
+let fromStartButton = document.getElementById("fromStartButton");
+let toEndButton = document.getElementById("toEndButton");
+let rewindButton = document.getElementById("rewindButton");
+let forwardButton = document.getElementById("forwardButton");
+
+playButton.addEventListener("click", function () {
+  if (video.paused) {
+    video.play();
+    // Change it into play button
+    playButton.innerHTML = '<i class="fas fa-pause" style="color: white;"></i>';
+  } else {
+    video.pause();
+    // Change it into pause button
+    playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+  }
+});
+
+fromStartButton.addEventListener("click", function () {
+  video.currentTime = 0;
+});
+
+toEndButton.addEventListener("click", function () {
+  video.currentTime = video.duration;
+  video.pause();
+  // Change it into pause button
+  playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+});
+
+rewindButton.addEventListener("click", function () {
+  video.currentTime -= 5;
+});
+
+forwardButton.addEventListener("click", function () {
+  video.currentTime += 5;
+});
+
+// Make the seekbar work
+let seekBar = document.getElementById("seekBar");
+
+video.addEventListener("timeupdate", function () {
+  let value = (100 / video.duration) * video.currentTime;
+  seekBar.value = value;
+});
+
+function seek() {
+  let time = video.duration * (seekBar.value / 100);
+  video.currentTime = time;
+}
+
+// If video ends then change the play button to play
+video.addEventListener("ended", function () {
+  playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+});
+
+
+function showResolution() {
+  var Res = document.getElementById("resolution").value;
+
+  if (Res !== "Custom") {
+    var allTabs = document.querySelectorAll('.hidden');
+    allTabs.forEach(tab => {
+      tab.style.display = 'none';
+    });
+    return;
+  }
+
+  // Hide all tabs
+  var allTabs = document.querySelectorAll('.hidden');
+
+  allTabs.forEach(tab => {
+    tab.style.display = 'none';
+  });
+
+  // Show the selected tab
+  document.getElementById(Res).style.display = 'block';
 }
 
 generateRuler();
