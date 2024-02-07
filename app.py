@@ -35,11 +35,16 @@ def signup():
         password = request.form["password"]
 
         # Create a user
-        user = {"username": username, "name": name, "email": email, "password": password}
+        user = {
+            "username": username,
+            "name": name,
+            "email": email,
+            "password": password,
+        }
 
         # Add user to database
 
-        return redirect(url_for("profile", usr=user))
+        return redirect(url_for("profile", name=username))
     else:
         return render_template("sign-up.html")
 

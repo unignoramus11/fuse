@@ -9,6 +9,8 @@ fetch("https://random-word-form.herokuapp.com/random/adjective")
       .then((noun) => {
         var newName = adjective[0] + " " + noun[0];
         projectInput.placeholder = newName;
+        // Convert to title case
+        newName = newName.replace(/\b\w/g, (l) => l.toUpperCase());
         document.title = "Fuse | " + newName;
       });
   });
