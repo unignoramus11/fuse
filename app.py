@@ -42,7 +42,7 @@ def signup():
 # Create a new route for admin
 @app.route("/admin")
 def admin():
-    return render_template("tables.html")
+    return render_template("admin-dashboard.html")
 
 
 @app.route("/profile/<usr>")
