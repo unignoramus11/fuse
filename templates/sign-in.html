@@ -93,7 +93,7 @@
 
                   <div class="text-center">
                     <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2"
-                      onclick="window.location.href='{{ url_for('signin') }}';">
+                      onclick="check()">
                       Sign In
                     </button>
                   </div>
@@ -121,6 +121,15 @@
         damping: "0.5",
       };
       Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
+    }
+
+    function check() {
+      var username = document.getElementsByName('username')[0].value;
+      var password = document.getElementsByName('password')[0].value;
+
+      if !(username == "" || password == "") {
+        window.location.href='{{ url_for('signin') }}';
+      }
     }
   </script>
 

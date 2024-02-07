@@ -9,6 +9,7 @@ fetch("https://random-word-form.herokuapp.com/random/adjective")
       .then((noun) => {
         var newName = adjective[0] + " " + noun[0];
         projectInput.placeholder = newName;
+        document.title = "Fuse | " + newName;
       });
   });
 
@@ -83,9 +84,7 @@ function displayFiles(files) {
       // Append the image to the grid
       grid.appendChild(img);
       document.getElementById("image-grid-container").appendChild(grid);
-    }
-
-    else if (file.type.startsWith("audio/")) {
+    } else if (file.type.startsWith("audio/")) {
       // Get the audio list container
       audioListContainer = document.getElementById("audio-list-container");
       let audioItem = document.createElement("div");
@@ -105,24 +104,27 @@ function displayFiles(files) {
       let playButton = document.createElement("button");
       playButton.type = "button";
       playButton.classList.add("play-button");
-      playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+      playButton.innerHTML =
+        '<i class="fas fa-play" style="color: white;"></i>';
 
       playButton.addEventListener("click", function () {
         if (audio.paused) {
           audio.play();
           // Change it into play button
-          playButton.innerHTML = '<i class="fas fa-pause" style="color: white;"></i>';
+          playButton.innerHTML =
+            '<i class="fas fa-pause" style="color: white;"></i>';
         } else {
           audio.pause();
           // Change it into pause button
-          playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+          playButton.innerHTML =
+            '<i class="fas fa-play" style="color: white;"></i>';
         }
-      }
-      );
+      });
 
       // Change to play button when the audio ends
       audio.addEventListener("ended", function () {
-        playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+        playButton.innerHTML =
+          '<i class="fas fa-play" style="color: white;"></i>';
       });
 
       audioControls.appendChild(playButton);
@@ -131,11 +133,9 @@ function displayFiles(files) {
       // Append the audio to the audio list container
       audioListContainer.appendChild(audioItem);
       audioItem.appendChild(audio);
-
     }
   }
 }
-
 
 // Submit project for processing
 function exportProject() {
@@ -248,27 +248,26 @@ video.addEventListener("ended", function () {
   playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
 });
 
-
 function showResolution() {
   var Res = document.getElementById("resolution").value;
 
   if (Res !== "Custom") {
-    var allTabs = document.querySelectorAll('.hidden');
-    allTabs.forEach(tab => {
-      tab.style.display = 'none';
+    var allTabs = document.querySelectorAll(".hidden");
+    allTabs.forEach((tab) => {
+      tab.style.display = "none";
     });
     return;
   }
 
   // Hide all tabs
-  var allTabs = document.querySelectorAll('.hidden');
+  var allTabs = document.querySelectorAll(".hidden");
 
-  allTabs.forEach(tab => {
-    tab.style.display = 'none';
+  allTabs.forEach((tab) => {
+    tab.style.display = "none";
   });
 
   // Show the selected tab
-  document.getElementById(Res).style.display = 'block';
+  document.getElementById(Res).style.display = "block";
 }
 
 generateRuler();
