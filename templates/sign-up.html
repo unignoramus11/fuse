@@ -73,6 +73,10 @@
               <div class="card-body">
                 <form role="form text-left" method="POST" action="{{ url_for('signup') }}">
                   <div class="mb-3">
+                    <input type="text" name="username" class="form-control" placeholder="Username" aria-label="Username"
+                      aria-describedby="email-addon" required />
+                  </div>
+                  <div class="mb-3">
                     <input type="text" name="name" class="form-control" placeholder="Name" aria-label="Name"
                       aria-describedby="email-addon" required />
                   </div>
