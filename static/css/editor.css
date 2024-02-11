@@ -216,7 +216,7 @@ input[type="range"] {
   transition: all 0.2s;
 }
 
-#dialog {
+.dialog {
   border-radius: 20px;
   background-color: #E9A6A6;
   /* blur everything behind this */

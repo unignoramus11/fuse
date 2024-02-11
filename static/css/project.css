@@ -1,8 +1,3 @@
-/* Capitalise project name */
-#projectName {
-  text-transform: capitalize;
-}
-
 #titleBar {
   margin: 10px 50px 20px 50px;
   display: flex;
@@ -252,6 +247,7 @@
   -webkit-transition-duration: 0.4s;
   -o-transition-duration: 0.4s;
   background-color: #3f3351;
+  cursor: pointer;
 }
 
 .search-container {

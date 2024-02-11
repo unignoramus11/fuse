@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='/img/favicon.ico') }}" />
   <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='/img/apple-icon.png') }}" />
 
-  <title>New Project</title>
+  <title>Fuse | New Project</title>
 
   <link href="{{ url_for('static', filename='/css/nucleo-svg.css') }}" rel="stylesheet" />
   <link href="{{ url_for('static', filename='/css/nucleo-svg.css') }}" rel="stylesheet" />
@@ -27,7 +27,7 @@
 <body>
   <div id="titleBar" class="flex">
     <!-- Project Name -->
-    <input type="text" name="projectName" id="projectName" placeholder="Loading..." />
+    <input type="text" name="projectName" id="projectName" placeholder="Loading..." onchange="" />
 
     <!-- Export button -->
     <button class="btn btn-primary" id="exportButton" onclick="exportProject()">
@@ -37,7 +37,7 @@
 
   <!-- Submit project dialog -->
   <div class="dialog-container" id="dialog-container">
-    <dialog id="dialog">
+    <dialog id="dialog" class="dialog">
       <h2>Export Project</h2>
       <p>Are you sure you want to send this video for processing?</p>
       <label for="exportFormat">Export Format:</label>
@@ -58,7 +58,7 @@
         <option value="Custom"> Custom </option>
       </select>
       <div id="Custom" class="hidden">
-        <p> 
+        <p>
           Height: <input type="number" id="heightRes" name="heightRes" placeholder="in pixels">
           Width: <input type="number" id="widthRes" name="widthRes" placeholder="in pixels">
         </p>
@@ -70,14 +70,26 @@
     </dialog>
   </div>
 
+  <!-- Succesful Project Submission Dialog -->
+  <div class="dialog-container" id="succesful-dialog-container">
+    <dialog id="succesful-dialog" class="dialog" style="background-color: #00ffea;">
+      <h2> Succesful </h2>
+      <p> The project has been sent for processing. </p>
+      <menu>
+        <button class="dashboardPage" onclick="document.getElementById('drop-zone').submit()">Go to Homepage</button>
+      </menu>
+    </dialog>
+  </div>
+
   <!-- File picker -->
   <div id="main-container">
     <div class="left-subcontainer">
-      <div id="drop-zone" class="prevent-select">
+      <form id="drop-zone" class="prevent-select" method="POST" action="{{ url_for('upload_file') }}"
+        enctype="multipart/form-data">
         <img src="{{ url_for('static', filename='/img/small-logos/drag-drop.png') }}" alt="Drag and Drop" id="dd" />
-        <input type="file" id="docpicker" accept="image/*, audio/*" multiple style="display: none" />
+        <input type="file" name="images" id="docpicker" accept="image/*, audio/*" multiple style="display: none" />
         <div class="upload-label">Click or drop here to upload</div>
-      </div>
+      </form>
       <div id="image-list" class="container-box">
         <div class="searchBar">
           <div class="searchText">Images</div>
@@ -98,7 +110,6 @@
     </div>
 
     <!-- Video preview -->
-
     <div class="video">
       <!-- Video -->
       <div class="videoPreview wrapper">

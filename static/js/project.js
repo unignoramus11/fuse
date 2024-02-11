@@ -8,16 +8,21 @@ fetch("https://random-word-form.herokuapp.com/random/adjective")
       .then((response) => response.json())
       .then((noun) => {
         var newName = adjective[0] + " " + noun[0];
-        projectInput.placeholder = newName;
         // Convert to title case
         newName = newName.replace(/\b\w/g, (l) => l.toUpperCase());
+
+        // Set the project name and the title bar
         document.title = "Fuse | " + newName;
+        projectInput.placeholder = newName;
       });
   });
 
 // Change the title bar every time the project is renamed
-projectInput.addEventListener("input", function () {
+projectInput.addEventListener("change", function () {
   document.title = "Fuse | " + projectInput.value;
+  if (projectInput.value == "") {
+    document.title = "Fuse | " + projectInput.placeholder;
+  }
 });
 
 // Change the search icon color when the input is focused for all the search boxes
@@ -82,10 +87,21 @@ function displayFiles(files) {
       // Set the image source and alt attributes
       img.src = URL.createObjectURL(file);
       img.style.width = "100%";
+
+
       img.alt = file.name;
+
+      // Fade the image when clicked
+      (function (img) {
+        img.addEventListener("click", function () {
+          img.classList.toggle("selected");
+        });
+      })(img);
+
       // Append the image to the grid
       grid.appendChild(img);
       document.getElementById("image-grid-container").appendChild(grid);
+
     } else if (file.type.startsWith("audio/")) {
       // Get the audio list container
       audioListContainer = document.getElementById("audio-list-container");
@@ -106,8 +122,7 @@ function displayFiles(files) {
       let playButton = document.createElement("button");
       playButton.type = "button";
       playButton.classList.add("play-button");
-      playButton.innerHTML =
-        '<i class="fas fa-play" style="color: white;"></i>';
+      playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
 
       playButton.addEventListener("click", function () {
         if (audio.paused) {
@@ -141,7 +156,12 @@ function displayFiles(files) {
 
 // Submit project for processing
 function exportProject() {
-  // Open a custom dialog box to confirm the project name
+  // Open a custom dialog box to confirm the video format and resolution
+  if (document.getElementById("image-grid-container").childElementCount == 0) {
+    // TODO: Show error of timeline empty
+    alert("Please upload images to the project before exporting.");
+    return;
+  }
 
   var dialog_container = document.getElementById("dialog-container");
   dialog_container.setAttribute("style", "display: block;");
@@ -155,18 +175,28 @@ function exportProject() {
   });
 
   dialog.querySelector(".confirm").addEventListener("click", () => {
+    // Send the project to the server for processing
+    dialog_container.setAttribute("style", "display: none;");
+    // Show success message
+    var success_dialog_container = document.getElementById("succesful-dialog-container");
+    success_dialog_container.setAttribute("style", "display: block;");
+    var success_dialog = document.getElementById("succesful-dialog");
+    success_dialog.showModal();
+
+    success_dialog.querySelector(".dashboardPage").addEventListener("click", () => {
+      document.getElementById('drop-zone').submit();
+      success_dialog.close();
+      success_dialog_container.setAttribute("style", "display: none;");
+    });
     dialog.close();
   });
 
   // Let users choose the export resolution
-
   var resolution = document.getElementById("resolution");
-
-  // TODO: Send the project to the server for processing
-
   var projectName = projectInput.value;
   var exportResolution = resolution.value;
   showResolution();
+
 }
 
 // Generate the seconds labels for the timeline

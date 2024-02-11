@@ -91,7 +91,7 @@
                   </div>
                   <div class="text-center">
                     <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2"
-                      onclick="window.location.href='{{ url_for('signup') }}';">
+                      onclick="check();">
                       Sign up
                     </button>
                   </div>
@@ -120,6 +120,21 @@
       };
       Scrollbar.init(document.querySelector("#sidenav-scrollbar"), options);
     }
+
+    function validateEmail(email) {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    function check() {
+        var username = document.getElementsByName('username')[0].value;
+        var name = document.getElementsByName('name')[0].value;
+        var email = document.getElementsByName('email')[0].value;
+        var password = document.getElementsByName('password')[0].value;
+
+        if (username != "" && password != "" && email != "" && name != "" && validateEmail(email)) {
+        window.location.href = '{{ url_for("signup") }}';
+      }
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>

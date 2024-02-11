@@ -301,3 +301,5 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 static/.DS_Store
+
+uploads/*
