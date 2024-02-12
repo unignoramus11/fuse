@@ -30,7 +30,7 @@ def home():
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         if not database.authenticate(username, hashed_password):
-            return "Invalid username or password"
+            return redirect(url_for("error", error="Invalid username or password"))
 
         # Store the username as a jwt token
         data = jwt.encode({"username": username}, env["SECRET_KEY"], algorithm="HS256")
@@ -55,7 +55,7 @@ def signup():
         password = request.form["password"]
 
         if database.userExists(username):
-            return "User already exists"
+            return redirect(url_for("error", error="User already exists"))
 
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
@@ -97,7 +97,7 @@ def create():
     # Decode the token
     token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
     user = database.getUser(token["username"])
-    return render_template("project.html", name=user[2])
+    return render_template("project-editor.html", name=user[2])
 
 
 @app.route("/upload_file", methods=["POST"])
@@ -116,10 +116,10 @@ def upload_file():
 
     # Images here is actually all media files
     if "images" not in request.files:
-        return "Something went wrong! Please try again."
+        return redirect(url_for("error", error="Something went wrong! Please try again."))
     for file in request.files.getlist("images"):
         if file.filename == "":
-            return "No selected file! Please try again."
+            return redirect(url_for("error", error="No selected file! Please try again."))
         if file:
             # If folder doesn't exist
             if not os.path.exists(f"uploads/{username}"):
@@ -149,6 +149,10 @@ def signout():
     response = redirect(url_for("home"))
     response.set_cookie("token", expires=0)
     return response
+
+@app.route("/error/<error>")
+def error(error):
+    return render_template("error.html", error=error)
 
 
 if __name__ == "__main__":

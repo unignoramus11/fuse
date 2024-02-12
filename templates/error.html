@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link id="pagestyle" href="{{ url_for('static', filename='/css/soft-ui-dashboard.css') }}" rel="stylesheet" />
+
+</head>
+
+<body>
+    <script>
+        alert("{{ error }}");
+        window.history.back();
+    </script>
+</body>
+
+</html>

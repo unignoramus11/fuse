@@ -81,7 +81,7 @@
     </dialog>
   </div>
 
-  <!-- File picker -->
+  <!-- Everything Else -->
   <div id="main-container">
     <div class="left-subcontainer">
       <form id="drop-zone" class="prevent-select" method="POST" action="{{ url_for('upload_file') }}"
@@ -92,9 +92,9 @@
       </form>
       <div id="image-list" class="container-box">
         <div class="searchBar">
-          <div class="searchText">Images</div>
+          <div class="searchText" id="imgFind">Images</div>
           <div class="search-container">
-            <form action="/search" method="get" class="form">
+            <form action="/search" method="get" class="form" onsubmit="return handleSubmit(event)">
               <input class="searchImage expandright" id="searchright" type="search" name="q" placeholder="Search" />
               <label class="button searchbutton mgIcon" for="searchright">
                 <span class="mglass">&#9906;</span>

@@ -88,10 +88,10 @@ function displayFiles(files) {
       img.src = URL.createObjectURL(file);
       img.style.width = "100%";
 
-
       img.alt = file.name;
 
-      // Fade the image when clicked
+
+      // Fade the image when selected
       (function (img) {
         img.addEventListener("click", function () {
           img.classList.toggle("selected");
@@ -105,21 +105,28 @@ function displayFiles(files) {
     } else if (file.type.startsWith("audio/")) {
       // Get the audio list container
       audioListContainer = document.getElementById("audio-list-container");
-      let audioItem = document.createElement("div");
+      var audioItem = document.createElement("div");
       audioItem.classList.add("audio-item");
-      let audio = document.createElement("audio");
+      audioItem.classList.add("prevent-select");
+
+      var checkBox = document.createElement("input");
+      checkBox.type = "checkbox";
+      checkBox.classList.add("audio-checkbox");
+      audioItem.append(checkBox);
+
+      var audio = document.createElement("audio");
       audio.src = URL.createObjectURL(file);
       audio.alt = file.name;
 
       // Show the file name beside the audio
-      let audioName = document.createElement("p");
+      var audioName = document.createElement("p");
       audioName.textContent = file.name;
       audioItem.appendChild(audioName);
 
       // Custom audio controls
-      let audioControls = document.createElement("div");
+      var audioControls = document.createElement("div");
       audioControls.classList.add("audio-controls");
-      let playButton = document.createElement("button");
+      var playButton = document.createElement("button");
       playButton.type = "button";
       playButton.classList.add("play-button");
       playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
@@ -150,9 +157,16 @@ function displayFiles(files) {
       // Append the audio to the audio list container
       audioListContainer.appendChild(audioItem);
       audioItem.appendChild(audio);
+
+      audioItem.addEventListener('click', function (event) {
+        if (event.target !== checkBox && event.target !== playButton && event.target.tagName !== 'I') {
+          checkBox.checked = !checkBox.checked;
+        }
+      });
     }
   }
 }
+
 
 // Submit project for processing
 function exportProject() {
@@ -303,3 +317,50 @@ function showResolution() {
 }
 
 generateRuler();
+
+
+function handleSubmit(event) {
+  event.preventDefault();
+  return false;
+}
+
+function searchImage(searchTerm) {
+  let imageDivs = document.querySelectorAll(".image-grid");
+
+  imageDivs.forEach(div => {
+    let altText = div.querySelector("img").alt.toLowerCase();
+
+    if (altText.includes(searchTerm)) {
+      div.style.display = "flex";
+    } else {
+      div.style.display = "none";
+    }
+  });
+}
+
+let findImg = document.getElementById("searchright");
+findImg.addEventListener("keydown", () => {
+  let searchTerm = findImg.value;
+  searchImage(searchTerm.toLowerCase())
+});
+
+
+function searchAudio(searchTerm) {
+  let audioDivs = document.querySelectorAll(".audio-item");
+
+  audioDivs.forEach(div => {
+    let altText = div.querySelector("audio").alt.toLowerCase();
+
+    if (altText.includes(searchTerm)) {
+      div.style.display = "flex";
+    } else {
+      div.style.display = "none";
+    }
+  });
+}
+
+let findAud = document.getElementById("searchright2");
+findAud.addEventListener("keydown", () => {
+  let searchTerm = findAud.value;
+  searchAudio(searchTerm.toLowerCase())
+});

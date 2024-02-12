@@ -1,50 +1,80 @@
-from moviepy.editor import *
-import csv
-import random
-
-user = "admin"
-projectID = 1
+import ffmpeg
+import json
 
 
-def createVideo(user, projectID, codec="libx264"):
-    """Convert the given images and audio in the uploads/{user} folder to a video"""
+def create_video(username, project_id):
+    # Define paths
+    base_path = (
+        "uploads/" + username + "/" + project_id + "/"
+    )
+    json_file = (
+        base_path + "project_data.json"
+    ) 
+    output_file = base_path + project_id + ".mp4"
 
-    # Get the list of images in the uploads/{user}/{projectID}/ folder
-    images = os.listdir(f"uploads/{user}/{projectID}/images")
+    # Load JSON data
+    with open(json_file, "r") as f:
+        data = json.load(f)
 
-    # Create a list to store the images
-    imageList = []
+    # Extract video parameters
+    video_name = data["name"]
+    video_format = data["format"]
+    fps = data["fps"]
+    height = data["height"]
+    width = data["width"]
 
-    # Loop through the images and add them to the list
-    for image in images:
-        # Random duration
-        duration = random.randint(1, 5)
-        imageList.append(
-            ImageClip(f"uploads/{user}/{projectID}/images/{image}").set_duration(
-                duration
-            )
+    # Extract image and audio information
+    images = data["images"]
+    audio = data.get("audio", [])
+
+    # Define a list to store input streams
+    streams = []
+
+    # Create input streams for each image with respective durations and transitions
+    for idx, image_info in enumerate(images):
+        file = base_path + image_info["file"].lstrip(
+            "/"
+        )  # Remove the slash from the image file name
+        duration_ms = (
+            image_info["duration_ms"] / 1000
+        )  # Convert milliseconds to seconds
+        transition = image_info["transition"]
+
+        # Apply loop filter with specified duration and number of frames
+        loop_frames = int(fps * duration_ms)  # Calculate the number of frames to loop
+        stream = (
+            ffmpeg.input(file)
+            .filter("loop", loop=1, size=loop_frames)
+            .filter("trim", duration=duration_ms)
         )
 
-    # Create a video from the images
-    video = concatenate_videoclips(imageList, method="compose")
+        if idx > 0 and transition == "fade":
+            stream = stream.filter(
+                "fade", type="in", duration=1
+            )  # Apply fade transition for all images except the first one
 
-    # Get the list of audios from CSV
-    # audioList = [
-    #     f"uploads/{user}/{projectID}/audio/{audio}"
-    #     for audio in os.listdir(f"uploads/{user}/{projectID}/audio")
-    # ]
+        streams.append(stream)
 
-    # Add the audio to the video
-    # if audioList:
-    #     audio = AudioFileClip(audioList[0])
-    #     video = video.set_audio(audio)
+    # Concatenate the input streams
+    video = ffmpeg.concat(*streams, v=1, a=0)
 
-    # Save the video to the uploads/{user} folder
-    video.write_videofile(f"uploads/{user}/{projectID}.mp4", fps=30, codec=codec)
+    # Add audio if available
+    if audio:
+        audio_file = base_path + audio[0]["file"]
+        audio_duration_ms = (
+            audio[0]["duration_ms"] / 1000
+        )  # Convert milliseconds to seconds
+        audio_stream = ffmpeg.input(audio_file).filter(
+            "atrim", duration=audio_duration_ms
+        )
+        video = ffmpeg.output(video, audio_stream, output_file, shortest=None)
+    else:
+        video = ffmpeg.output(video, output_file)
 
-    # Return the path to the video
-    return f"uploads/{user}/{projectID}.mp4"
+    # Run ffmpeg command
+    ffmpeg.run(video)
 
 
-createVideo(user, projectID)
-
+username = "admin"
+project_id = "1"
+create_video(username, project_id)

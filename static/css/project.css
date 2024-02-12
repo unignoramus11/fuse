@@ -376,6 +376,16 @@
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+
+}
+
+.audio-item:hover {
+  cursor: pointer;
+}
+
+.audio-checkbox {
+  cursor: pointer;
+  accent-color: #1f1d36;
 }
 
 audio {
@@ -403,4 +413,26 @@ audio {
 
 .hidden {
   display: none;
+}
+
+.selected {
+  opacity: 25%;
+}
+
+.selectOverlay {
+  height: 100%;
+  width: 100%;
+  z-index: 69;
+  background-image: url('../img/check-30.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+}
+
+#audContent {
+  width: 916vw;
+  height: calc(100% - 20px);
+  margin: 10px;
+
+  display: flex;
 }
