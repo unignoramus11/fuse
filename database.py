@@ -58,20 +58,23 @@ def createProject(name, username):
 
 def userExists(username):
     mycursor.execute(
-        "SELECT * FROM users WHERE username = %(username)s", {"username": username}
+        "SELECT * FROM users WHERE username = %(username)s", {
+            "username": username}
     )
     user = mycursor.fetchone()
-    return user != None
+    return user is not None
 
 
 def getAdminView():
-    mycursor.execute("SELECT username, noOfProjects FROM users WHERE username != 'admin'")
+    mycursor.execute(
+        "SELECT username, noOfProjects FROM users WHERE username != 'admin'")
     return mycursor.fetchall()
 
 
 def getUser(username):
     mycursor.execute(
-        "SELECT * FROM users WHERE username = %(username)s", {"username": username}
+        "SELECT * FROM users WHERE username = %(username)s", {
+            "username": username}
     )
     return mycursor.fetchone()
 
@@ -94,13 +97,15 @@ def getTasks(project_id):
 
 def getProject(project_id):
     mycursor.execute(
-        "SELECT * FROM projects WHERE id = %(project_id)s", {"project_id": project_id}
+        "SELECT * FROM projects WHERE id = %(project_id)s", {
+            "project_id": project_id}
     )
     return mycursor.fetchone()
 
 
 def getTask(task_id):
-    mycursor.execute("SELECT * FROM tasks WHERE id = %(task_id)s", {"task_id": task_id})
+    mycursor.execute(
+        "SELECT * FROM tasks WHERE id = %(task_id)s", {"task_id": task_id})
     return mycursor.fetchone()
 
 
@@ -118,6 +123,12 @@ def getLastProject(username):
         {"username": username},
     )
     return mycursor.fetchone()
+
+
+def removeTask(project_id):
+    mycursor.execute("DELETE FROM tasks WHERE project_id = %(project_id)s", {
+                     "project_id": project_id})
+    mydb.commit()
 
 
 createDatabase()

@@ -7,12 +7,13 @@ This is an app created by team Code Fusion for the Introduction to Software Syst
 ## Installation
 
 1. Clone the repository
-2. Install the required packages using the following command:
+2. Install the required packages using the following command (for Mac) (similarly for other OS's):
 
    ```bash
    python -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
+   brew install ffmpeg
    ```
 
 ## Usage

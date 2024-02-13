@@ -194,7 +194,6 @@ input[type="range"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .canvas,
   .canvas-low {
     display: none !important;
@@ -218,7 +217,7 @@ input[type="range"] {
 
 .dialog {
   border-radius: 20px;
-  background-color: #E9A6A6;
+  background-color: #e9a6a6;
   /* blur everything behind this */
   backdrop-filter: blur(20px);
   text-align: center;
@@ -346,4 +345,49 @@ input[type="range"] {
 .audio-item p {
   color: white;
   margin: 0;
+}
+
+.img-item {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 0.2s;
+}
+
+.timeline-image-modifiers {
+  display: flex;
+  /* make it so that the content is spaced uptil the edges */
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  background-color: #1f1d36c5;
+  border-radius: 5px;
+}
+
+.timeline-image-modifiers input {
+  width: min(55px, 50%);
+  margin: 20%;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+  margin: auto;
+  /* make text centered */
+  text-align: center;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.timeline-image-modifiers button {
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+  margin: auto;
 }

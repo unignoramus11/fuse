@@ -173,7 +173,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
-  padding-left: 6vw;
+  padding-left: calc(1vw + 30px + 1vw);
 }
 
 .image {
@@ -207,7 +207,7 @@
 .tickLabel {
   color: #777;
   font-size: 1vw;
-  width: 3vw;
+  width: 5vw;
 }
 
 .form {
@@ -298,9 +298,9 @@
   transition: all 0.8s;
 }
 
-.searchImage:focus+.searchbutton,
-.searchTransition:focus+.searchbutton,
-.searchAudio:focus+.searchbutton {
+.searchImage:focus + .searchbutton,
+.searchTransition:focus + .searchbutton,
+.searchAudio:focus + .searchbutton {
   transition-duration: 0.4s;
   -moz-transition-duration: 0.4s;
   -webkit-transition-duration: 0.4s;
@@ -351,6 +351,7 @@
   align-items: center;
 }
 
+/* Transitions */
 #transition-list {
   height: 20vh;
   overflow-y: auto;
@@ -358,6 +359,29 @@
   text-align: center;
   margin-top: 20px;
   border: 2px solid #1f1d36;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.transition-item {
+  /* display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column; */
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  width: 23vw;
+  height: 5vh;
+  background-color: #1f1d36;
+
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 10px;
+}
+
+.transition-item:hover {
+  cursor: pointer;
 }
 
 /* Audio */
@@ -376,11 +400,34 @@
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
-
 }
 
 .audio-item:hover {
   cursor: pointer;
+}
+
+.aud-item {
+  width: 23vw;
+  height: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1f1d36;
+
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 10px;
+}
+
+.img-item {
+  height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1f1d36;
+
+  border-radius: 10px;
+  border: 2px solid #1f1d36;
 }
 
 .audio-checkbox {
@@ -423,16 +470,25 @@ audio {
   height: 100%;
   width: 100%;
   z-index: 69;
-  background-image: url('../img/check-30.png');
+  background-image: url("../img/check-30.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 50%;
 }
 
+#imgContent {
+  width: 915vw;
+  height: calc(100% - 15px);
+  margin-left: 1vw;
+
+  display: flex;
+  align-items: center;
+}
+
 #audContent {
-  width: 916vw;
-  height: calc(100% - 20px);
-  margin: 10px;
+  width: 915vw;
+  height: calc(100% - 15px);
+  margin: 1vw;
 
   display: flex;
 }

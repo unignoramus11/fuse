@@ -1,9 +1,11 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify
+from flask import Flask, redirect, url_for, render_template, request
 from dotenv import dotenv_values
 import os
 import jwt
 import hashlib
 import database
+import json
+from tqdm import tqdm
 
 app = Flask(__name__)
 env = dotenv_values(".env")
@@ -30,10 +32,12 @@ def home():
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         if not database.authenticate(username, hashed_password):
-            return redirect(url_for("error", error="Invalid username or password"))
+            return redirect(url_for("error",
+                                    error="Invalid username or password"))
 
         # Store the username as a jwt token
-        data = jwt.encode({"username": username}, env["SECRET_KEY"], algorithm="HS256")
+        data = jwt.encode({"username": username},
+                          env["SECRET_KEY"], algorithm="HS256")
         response = redirect(url_for("dashboard"))
         response.set_cookie("token", data)
         return response
@@ -62,7 +66,8 @@ def signup():
         # Add user to database
         database.createUser(username, name, email, hashed_password)
 
-        data = jwt.encode({"username": username}, env["SECRET_KEY"], algorithm="HS256")
+        data = jwt.encode({"username": username},
+                          env["SECRET_KEY"], algorithm="HS256")
         response = redirect(url_for("dashboard"))
         response.set_cookie("token", data)
         return response
@@ -88,7 +93,7 @@ def dashboard():
     return render_template("dashboard.html", username=user[1], name=user[2])
 
 
-@app.route("/project-editor")
+@app.route("/project-editor", methods=["POST", "GET"])
 def create():
     # Check if JWT exists
     token = request.cookies.get("token")
@@ -112,34 +117,55 @@ def upload_file():
     username = user[1]
 
     # TODO: get project name from the form
-    project_id = database.createProject("Project 1", username)
+    # get the json file as a text field sent from the form
+    project_json = json.loads(request.form.get("json"))
+
+    project_id = database.createProject(
+        project_json["name"], username)  # also adds it to tasks
 
     # Images here is actually all media files
     if "images" not in request.files:
-        return redirect(url_for("error", error="Something went wrong! Please try again."))
-    for file in request.files.getlist("images"):
+        return redirect(
+            url_for("error", error="Something went wrong! Please try again.")
+        )
+    files = request.files.getlist("images")
+    total_files = len(files)
+    progress_bar = tqdm(total=total_files, desc="Uploading files", unit="file")
+
+    for file in files:
         if file.filename == "":
-            return redirect(url_for("error", error="No selected file! Please try again."))
+            print(file, end="\n---\n")
         if file:
             # If folder doesn't exist
             if not os.path.exists(f"uploads/{username}"):
                 os.makedirs(f"uploads/{username}")
             if not os.path.exists(f"uploads/{username}/{project_id}"):
                 os.makedirs(f"uploads/{username}/{project_id}")
+                with open(
+                    f"uploads/{username}/{project_id}/project_data.json",
+                    'w'
+                ) as json_file:
+                    json.dump(project_json, json_file)
                 os.makedirs(f"uploads/{username}/{project_id}/images")
                 os.makedirs(f"uploads/{username}/{project_id}/audio")
 
             # Check the MIME type of the file
             if file.content_type.startswith("image/"):
-                file.save(f"uploads/{username}/{project_id}/images/" + file.filename)
+                file.save(
+                    f"uploads/{username}/{project_id}/images/" + file.filename)
             elif file.content_type.startswith("audio/"):
-                file.save(f"uploads/{username}/{project_id}/audio/" + file.filename)
+                file.save(
+                    f"uploads/{username}/{project_id}/audio/" + file.filename)
             else:
                 return (
                     "Unsupported file type: "
                     + file.name
                     + "! Please upload an image or audio file."
                 )
+
+        progress_bar.update(1)
+
+    progress_bar.close()
 
     return redirect(url_for("dashboard"))
 
@@ -149,6 +175,7 @@ def signout():
     response = redirect(url_for("home"))
     response.set_cookie("token", expires=0)
     return response
+
 
 @app.route("/error/<error>")
 def error(error):
