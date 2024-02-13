@@ -1,1 +1,0 @@
-This is for adding the uploads folder in the repo, please ignore.
