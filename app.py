@@ -32,8 +32,7 @@ def home():
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         if not database.authenticate(username, hashed_password):
-            return redirect(url_for("error",
-                                    error="Invalid username or password"))
+            return redirect(url_for("error", error="Invalid username or password"))
 
         # Store the username as a jwt token
         data = jwt.encode({"username": username},
@@ -99,6 +98,17 @@ def create():
     token = request.cookies.get("token")
     if not token:
         return redirect(url_for("home"))
+
+    # Check if the user is on a mobile device
+    user_agent = request.user_agent.string.lower()
+    if "mobile" in user_agent or "android" in user_agent or "iphone" in user_agent:
+        return redirect(
+            url_for(
+                "error",
+                error="This feature is not available on mobile devices. \
+Please use a computer to access this feature.",
+            )
+        )
     # Decode the token
     token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
     user = database.getUser(token["username"])
@@ -121,7 +131,8 @@ def upload_file():
     project_json = json.loads(request.form.get("json"))
 
     project_id = database.createProject(
-        project_json["name"], username)  # also adds it to tasks
+        project_json["name"], username
+    )  # also adds it to tasks
 
     # Images here is actually all media files
     if "images" not in request.files:
@@ -142,8 +153,7 @@ def upload_file():
             if not os.path.exists(f"uploads/{username}/{project_id}"):
                 os.makedirs(f"uploads/{username}/{project_id}")
                 with open(
-                    f"uploads/{username}/{project_id}/project_data.json",
-                    'w'
+                    f"uploads/{username}/{project_id}/project_data.json", "w"
                 ) as json_file:
                     json.dump(project_json, json_file)
                 os.makedirs(f"uploads/{username}/{project_id}/images")
