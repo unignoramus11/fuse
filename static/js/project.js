@@ -112,7 +112,7 @@ function displayFiles(files) {
     /\s/g,
     "_"
   )}_form" class="timeline-image-modifiers">
-    <button class="leftArrow" onclick="moveLeft()">
+    <button class="leftArrow">
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <input
@@ -120,7 +120,7 @@ function displayFiles(files) {
       name="imgDuration"
       placeholder="5s"
     />
-    <button class="rightArrow" onclick="moveRight()">
+    <button class="rightArrow">
       <i class="fa-solid fa-arrow-right"></i>
     </button>
   </form>

@@ -117,6 +117,8 @@ Please use a computer to access this feature.",
 
 @app.route("/upload_file", methods=["POST"])
 def upload_file():
+    # TODO: wait for all files to be uploaded
+
     # Check if JWT exists
     token = request.cookies.get("token")
     if not token:
@@ -148,6 +150,8 @@ def upload_file():
             print(file, end="\n---\n")
         if file:
             # If folder doesn't exist
+            if not os.path.exists("uploads"):
+                os.makedirs("uploads")
             if not os.path.exists(f"uploads/{username}"):
                 os.makedirs(f"uploads/{username}")
             if not os.path.exists(f"uploads/{username}/{project_id}"):
