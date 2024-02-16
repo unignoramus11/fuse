@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request
+from flask import Flask, redirect, url_for, render_template, request, send_from_directory
 from dotenv import dotenv_values
 import os
 import jwt
@@ -18,6 +18,8 @@ def home():
     if token:
         try:
             data = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+            if data["username"] == "admin":
+                return redirect(url_for("admin"))
             return redirect(url_for("dashboard"))
         except jwt.InvalidTokenError:
             pass
@@ -27,12 +29,19 @@ def home():
         password = request.form.get("password")
 
         if username == "admin" and password == "admin":
-            return redirect(url_for("admin"))
+            data = jwt.encode({"username": "admin"},
+                              env["SECRET_KEY"], algorithm="HS256")
+            response = redirect(url_for("admin"))
+            response.set_cookie("token", data)
+            return response
 
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         if not database.authenticate(username, hashed_password):
-            return redirect(url_for("error", error="Invalid username or password"))
+            return redirect(url_for(
+                "error",
+                error="Invalid username or password")
+            )
 
         # Store the username as a jwt token
         data = jwt.encode({"username": username},
@@ -41,7 +50,12 @@ def home():
         response.set_cookie("token", data)
         return response
 
-    return render_template("index.html")
+    n_users, n_projects = database.getStats()
+    return render_template(
+        "index.html",
+        n_users=n_users,
+        n_projects=n_projects
+    )
 
 
 @app.route("/signin")
@@ -77,7 +91,29 @@ def signup():
 # Create a new route for admin
 @app.route("/admin")
 def admin():
-    return render_template("admin-dashboard.html")
+    # check if JWT exists
+    token = request.cookies.get("token")
+    if not token:
+        return redirect(url_for("home"))
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    user = database.getUser(token["username"])
+    if user[1] != "admin":
+        return redirect(url_for("home"))
+
+    # get all users from the database with their username,
+    #                                            name,
+    #                                            email,
+    #                                            no of projects
+    users = database.getAdminView()
+    n_users = len(users)
+    n_projects = sum([user[3] for user in users])
+    return render_template(
+        "admin-dashboard.html",
+        users=users,
+        n_users=n_users,
+        n_projects=n_projects
+    )
 
 
 @app.route("/dashboard")
@@ -88,8 +124,44 @@ def dashboard():
         return redirect(url_for("home"))
     # Decode the token
     token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return redirect(url_for("home"))
+    if token["username"] == "admin":
+        return redirect(url_for("admin"))
     user = database.getUser(token["username"])
-    return render_template("dashboard.html", username=user[1], name=user[2])
+
+    # get all projects from the database with their
+    # project_name from the database
+    projects = database.getProjects(user[1])
+    # in each project, add an element to the tuple, which is the name of the
+    # first file in the folder uploads/<username>/<project_id>/images
+    for i in range(len(projects)):
+        project_id = projects[i][0]
+        username = user[1]
+        if os.path.exists(f"uploads/{username}/{project_id}/images"):
+            images = os.listdir(f"uploads/{username}/{project_id}/images")
+            if images:
+                projects[i] = projects[i] + (images[0],)
+            else:
+                projects[i] = projects[i] + ("",)
+        else:
+            projects[i] = projects[i] + ("",)
+    # also check if the project is in the tasks table (still being processed)
+    # and add a flag to the tuple using getTaskByProjectID
+    for i in range(len(projects)):
+        project_id = projects[i][0]
+        task = database.getTaskByProjectID(project_id)
+        if task:
+            projects[i] = projects[i] + (False,)
+        else:
+            projects[i] = projects[i] + (True,)
+
+    return render_template(
+        "dashboard.html",
+        username=user[1],
+        name=user[2],
+        projects=projects
+    )
 
 
 @app.route("/project-editor", methods=["POST", "GET"])
@@ -98,19 +170,28 @@ def create():
     token = request.cookies.get("token")
     if not token:
         return redirect(url_for("home"))
+    # Convert token to bytes
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return redirect(url_for("home"))
+    if token["username"] == "admin":
+        return redirect(url_for("admin"))
 
     # Check if the user is on a mobile device
     user_agent = request.user_agent.string.lower()
-    if "mobile" in user_agent or "android" in user_agent or "iphone" in user_agent:
+    if (
+        "mobile" in user_agent or
+        "android" in user_agent or
+        "iphone" in user_agent
+    ):
         return redirect(
             url_for(
                 "error",
                 error="This feature is not available on mobile devices. \
-Please use a computer to access this feature.",
+Please use a desktop to access this feature.",
             )
         )
-    # Decode the token
-    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
     user = database.getUser(token["username"])
     return render_template("project-editor.html", name=user[2])
 
@@ -125,10 +206,14 @@ def upload_file():
         return redirect(url_for("home"))
     # Decode the token
     token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return redirect(url_for("home"))
+    if token["username"] == "admin":
+        return redirect(url_for("admin"))
+
     user = database.getUser(token["username"])
     username = user[1]
 
-    # TODO: get project name from the form
     # get the json file as a text field sent from the form
     project_json = json.loads(request.form.get("json"))
 
@@ -144,6 +229,7 @@ def upload_file():
     files = request.files.getlist("images")
     total_files = len(files)
     progress_bar = tqdm(total=total_files, desc="Uploading files", unit="file")
+    print(files, end="\n---\n")
 
     for file in files:
         if file.filename == "":
@@ -163,13 +249,14 @@ def upload_file():
                 os.makedirs(f"uploads/{username}/{project_id}/images")
                 os.makedirs(f"uploads/{username}/{project_id}/audio")
 
+            fname = file.filename.replace(" ", "_")
             # Check the MIME type of the file
             if file.content_type.startswith("image/"):
                 file.save(
-                    f"uploads/{username}/{project_id}/images/" + file.filename)
+                    f"uploads/{username}/{project_id}/images/" + fname)
             elif file.content_type.startswith("audio/"):
                 file.save(
-                    f"uploads/{username}/{project_id}/audio/" + file.filename)
+                    f"uploads/{username}/{project_id}/audio/" + fname)
             else:
                 return (
                     "Unsupported file type: "
@@ -194,6 +281,73 @@ def signout():
 @app.route("/error/<error>")
 def error(error):
     return render_template("error.html", error=error)
+
+
+@app.route("/uploads/<username>/<project_id>/<media_type>/<filename>")
+def uploaded_file(username, project_id, media_type, filename):
+    # first check if user is authenticated
+    token = request.cookies.get("token")
+    if not token:
+        return redirect(url_for("home"))
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return redirect(url_for("home"))
+    if token["username"] == "admin":
+        return redirect(url_for("admin"))
+
+    # check if user is the owner of the project
+    if token["username"] != username:
+        return redirect(url_for("error", error="You are not authorized to view this file"))
+    return send_from_directory(
+        f"uploads/{username}/{project_id}/{media_type}", filename
+    )
+
+
+@app.route("/download/<username>/<project_id>")
+def download(username, project_id):
+    # first check if user is authenticated
+    token = request.cookies.get("token")
+    if not token:
+        return redirect(url_for("home"))
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return redirect(url_for("home"))
+    if token["username"] == "admin":
+        return redirect(url_for("admin"))
+
+    # check if user is the owner of the project
+    if token["username"] != username:
+        return redirect(url_for(
+            "error",
+            error="You are not authorized to download this project"
+        ))
+
+    # check if the project is in the tasks table (still being processed)
+    task = database.getTaskByProjectID(project_id)
+    if task:
+        return redirect(url_for(
+            "error",
+            error="The project is still being processed. Please try again later."
+        ))
+
+    # get the video name and format from json file in the project folder
+    with open(f"uploads/{username}/{project_id}/project_data.json") as json_file:
+        project_json = json.load(json_file)
+        project_name = project_json["name"]
+        video_format = project_json["format"]
+
+    video_name = f"{project_name}.{video_format}"
+    # check if the video exists
+    if not os.path.exists(f"uploads/{username}/{project_id}/{video_name}"):
+        return redirect(url_for(
+            "error",
+            error="The video does not exist. Please try again later."
+        ))
+    return send_from_directory(
+        f"uploads/{username}/{project_id}", video_name, as_attachment=True
+    )
 
 
 if __name__ == "__main__":

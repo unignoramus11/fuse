@@ -67,7 +67,8 @@ def userExists(username):
 
 def getAdminView():
     mycursor.execute(
-        "SELECT username, noOfProjects FROM users WHERE username != 'admin'")
+        "SELECT username, name, email, noOfProjects FROM users WHERE username != 'admin'"
+    )
     return mycursor.fetchall()
 
 
@@ -109,6 +110,14 @@ def getTask(task_id):
     return mycursor.fetchone()
 
 
+def getTaskByProjectID(project_id):
+    mycursor.execute(
+        "SELECT * FROM tasks WHERE project_id = %(project_id)s", {
+            "project_id": project_id}
+    )
+    return mycursor.fetchall()
+
+
 def authenticate(username, password):
     mycursor.execute(
         "SELECT * FROM users WHERE username = %(username)s AND password = %(password)s",
@@ -129,6 +138,14 @@ def removeTask(project_id):
     mycursor.execute("DELETE FROM tasks WHERE project_id = %(project_id)s", {
                      "project_id": project_id})
     mydb.commit()
+
+
+def getStats():
+    mycursor.execute("SELECT COUNT(*) FROM users")
+    n_users = mycursor.fetchone()[0]
+    mycursor.execute("SELECT COUNT(*) FROM projects")
+    n_projects = mycursor.fetchone()[0]
+    return n_users, n_projects
 
 
 createDatabase()

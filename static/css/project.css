@@ -360,8 +360,14 @@
   margin-top: 20px;
   border: 2px solid #1f1d36;
   display: flex;
+  flex-direction: column;
+}
+
+.transition-list-container {
+  display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .transition-item {
@@ -370,18 +376,21 @@
   align-items: center;
   flex-direction: column; */
   padding: 10px;
-  border-bottom: 1px solid #ccc;
-  width: 23vw;
-  height: 5vh;
   background-color: #1f1d36;
-
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
   border-radius: 10px;
+  width: fit-content;
+  transition: scale 0.2s;
 }
 
 .transition-item:hover {
   cursor: pointer;
+  scale: 1.05;
+}
+
+.active {
+  background-color: #3f3351;
+  border: 2px solid #1f1d36;
 }
 
 /* Audio */
@@ -413,9 +422,6 @@
   justify-content: center;
   align-items: center;
   background-color: #1f1d36;
-
-  margin-left: 10px;
-  margin-right: 10px;
   border-radius: 10px;
 }
 
@@ -428,6 +434,15 @@
 
   border-radius: 10px;
   border: 2px solid #1f1d36;
+}
+
+.img-item:hover {
+  cursor: pointer;
+}
+
+.img-item.active {
+  border: 2px solid #ae7ce0;
+  border-radius: 5px;
 }
 
 .audio-checkbox {
@@ -488,7 +503,18 @@ audio {
 #audContent {
   width: 915vw;
   height: calc(100% - 15px);
-  margin: 1vw;
+  margin-left: 1vw;
 
   display: flex;
+  align-items: center;
+}
+
+#transition-list-placeholder {
+  height: 100%;
+  font-size: 1vw;
+  color: #88799f;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

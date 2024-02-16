@@ -391,3 +391,43 @@ input[type="number"]::-webkit-outer-spin-button {
   transition: all 0.2s;
   margin: auto;
 }
+
+.timeline-audio-modifiers {
+  display: flex;
+  /* make it so that the content is spaced uptil the edges */
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  background-color: #1f1d36c5;
+  border-radius: 5px;
+}
+
+.timeline-audio-modifiers input {
+  width: min(55px, 50%);
+  margin: 20%;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+  margin: auto;
+  /* make text centered */
+  text-align: center;
+  border: 2px solid #3f3351;
+}
+
+.timeline-audio-modifiers .file-name {
+  width: min(150px, 25%);
+  /* remove the borders shown when textbox is active */
+  border: none;
+}
+
+.timeline-audio-modifiers button {
+  border-radius: 10px;
+  background-color: #1f1d36;
+  color: white;
+  border: none;
+  transition: all 0.2s;
+  margin: auto;
+}

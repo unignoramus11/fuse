@@ -90,7 +90,7 @@
         <select id="exportFormat" name="exportFormat">
           <option value="mp4">MP4</option>
           <option value="mkv">MKV</option>
-          <option value="gif">AVI</option>
+          <option value="avi">AVI</option>
           <option value="mov">MOV</option>
           <option value="webm">WEBM</option>
         </select>
@@ -228,26 +228,26 @@
         <!-- Video player controls -->
         <div class="controls">
           <!-- Play from start button -->
-          <button id="fromStartButton" onclick="fromStart()">
+          <button id="fromStartButton">
             <i class="fa-solid fa-backward-step"></i>
           </button>
           <!-- Rewind back 5 seconds -->
-          <button id="rewindButton" onclick="rewind()">
+          <button id="rewindButton">
             <i class="fa-solid fa-backward"></i>
           </button>
 
           <!-- Pause Play -->
-          <button id="playButton" onclick="playPause()">
+          <button id="playButton">
             <i class="fa-solid fa-play"></i>
           </button>
 
           <!-- Forward 5 seconds -->
-          <button id="forwardButton" onclick="forward()">
+          <button id="forwardButton">
             <i class="fa-solid fa-forward"></i>
           </button>
 
           <!-- Finish video -->
-          <button id="toEndButton" onclick="toEnd()">
+          <button id="toEndButton">
             <i class="fa-solid fa-forward-step"></i>
           </button>
         </div>
@@ -274,11 +274,14 @@
               </div>
             </label>
           </div>
-          <div id="audio-list-content" class="content">
-            <div class="audio-list-container" id="audio-list-container">
-              <div class="audio-item">Fade</div>
-              <div class="audio-item">Blur</div>
-              <div class="audio-item">Rotate (Beta)</div>
+          <div id="transition-list-placeholder">
+            <p>Please select an image to add transition</p>
+          </div>
+          <div id="transition-list-content" class="content">
+            <div class="transition-list-container prevent-select" id="transition-list-container">
+              <div class="transition-item" id="fade">Fade</div>
+              <div class="transition-item" id="blur">Blur</div>
+              <div class="transition-item" id="rotate">Rotate (Beta)</div>
             </div>
           </div>
         </div>

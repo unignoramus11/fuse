@@ -39,6 +39,8 @@ for (var i = 0; i < searchInput.length; i++) {
   });
 }
 
+let selectedFiles = [];
+
 // Drag and drop support
 let dropZone = document.getElementById("drop-zone");
 let fileInput = document.getElementById("docpicker");
@@ -59,11 +61,15 @@ dropZone.addEventListener("drop", function (e) {
 
   var files = e.dataTransfer.files;
   displayFiles(files);
+  // extend the selectedFiles array with the new files
+  selectedFiles = selectedFiles.concat(files);
 });
 
 fileInput.addEventListener("change", function (e) {
   var files = e.target.files;
   displayFiles(files);
+  // extend the selectedFiles array with the new files
+  selectedFiles = selectedFiles.concat(files);
 });
 
 // Click event to trigger file input
@@ -108,11 +114,11 @@ function displayFiles(files) {
             )})`;
 
             timelineImageContainer.innerHTML = `
-  <form id="${file.name.replace(
-    /\s/g,
-    "_"
-  )}_form" class="timeline-image-modifiers">
-    <button class="leftArrow">
+ <form id="${file.name.replace(
+   /\s/g,
+   "_"
+ )}_form" class="timeline-image-modifiers">
+    <button type="button" class="leftArrow">
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <input
@@ -120,23 +126,83 @@ function displayFiles(files) {
       name="imgDuration"
       placeholder="5s"
     />
-    <button class="rightArrow">
+    <input
+      type="text"
+      name="imgTransition"
+      value="fade"
+      hidden
+    />
+    <button type="button" class="rightArrow">
       <i class="fa-solid fa-arrow-right"></i>
     </button>
   </form>
 `;
+            // add a click event listener to the image element which toggles the active class
+            timelineImageContainer.addEventListener("click", function (e) {
+              if (
+                e.target.tagName !== "INPUT" &&
+                e.target.tagName !== "BUTTON" &&
+                e.target.tagName !== "I"
+              ) {
+                for (let i = 0; i < imageContent.children.length; i++) {
+                  if (imageContent.children[i] !== timelineImageContainer)
+                    imageContent.children[i].classList.remove("active");
+                }
+                timelineImageContainer.classList.toggle("active");
+
+                // if no image is active. hide the transition list content id div and make the transition list placeholder id visible
+                if (!timelineImageContainer.classList.contains("active")) {
+                  document.getElementById(
+                    "transition-list-content"
+                  ).style.display = "none";
+                  document.getElementById(
+                    "transition-list-placeholder"
+                  ).style.display = "flex";
+                } else {
+                  document.getElementById(
+                    "transition-list-content"
+                  ).style.display = "flex";
+                  document.getElementById(
+                    "transition-list-placeholder"
+                  ).style.display = "none";
+
+                  // from the active image's form, get the value of the imgTransition input and set the transition list element with the same id to active
+                  let activeImage = document.querySelector(".img-item.active");
+                  if (activeImage) {
+                    // get transition id from the form
+                    let transitionName = activeImage.querySelector(
+                      "input[name=imgTransition]"
+                    ).value;
+                    for (let j = 0; j < transitionList.children.length; j++) {
+                      if (transitionList.children[j].id === transitionName) {
+                        transitionList.children[j].classList.add("active");
+                      } else {
+                        transitionList.children[j].classList.remove("active");
+                      }
+                    }
+                  }
+                }
+              }
+            });
 
             // add a duration change event listener
-            let form = timelineImageContainer.querySelector("form");
-            form.addEventListener("submit", function (event) {
-              event.preventDefault();
-              let duration = form.querySelector("input").value;
-              if (duration) {
-                timelineImageContainer.style.width = duration * 5 + "vw";
-              } else {
-                timelineImageContainer.style.width = "25vw";
-                form.querySelector("input").value = 5;
+            let imgDuration = timelineImageContainer.querySelector(
+              "input[name=imgDuration]"
+            );
+            imgDuration.addEventListener("change", function () {
+              let duration = imgDuration.value;
+              if (duration === "") {
+                duration = 5;
+                imgDuration.value = 5;
               }
+              if (duration < 1) {
+                duration = 1;
+                imgDuration.value = 1;
+              }
+              let imageWidth = duration * 5;
+              timelineImageContainer.style.width = imageWidth + "vw";
+              // make it so that the text input is no longer selected
+              imgDuration.blur();
             });
 
             // add a left arrow click event listener, which exchanges the image element with the one before it
@@ -148,6 +214,7 @@ function displayFiles(files) {
                   timelineImageContainer,
                   previous
                 );
+                console.log("left arrow clicked");
               }
             });
 
@@ -161,6 +228,7 @@ function displayFiles(files) {
                   next,
                   timelineImageContainer
                 );
+                console.log("right arrow clicked");
               }
             });
 
@@ -201,7 +269,8 @@ function displayFiles(files) {
 
       // Show the file name beside the audio
       var audioName = document.createElement("p");
-      audioName.textContent = file.name;
+      // set the text of the p element to the file name after replacing _ with space
+      audioName.textContent = file.name.replace(/\_/g, " ");
       audioItem.appendChild(audioName);
 
       // Custom audio controls
@@ -245,32 +314,84 @@ function displayFiles(files) {
       audioItem.appendChild(audio);
 
       ((file, audioItem, checkBox, playButton) => {
-        let audItem = document.createElement("div");
-        audItem.classList.add("aud-item");
-        audItem.classList.add("prevent-select");
-
-        var audName = document.createElement("p");
-        audName.textContent = file.name;
-        audItem.appendChild(audName);
+        // create an aud-item for timeline similar to the img-item
+        let audItem;
 
         let audioList = document.getElementById("audContent");
         audioItem.addEventListener("click", function (event) {
-          if (
-            event.target !== checkBox &&
-            event.target !== playButton &&
-            event.target.tagName !== "I"
-          ) {
-            checkBox.checked = !checkBox.checked;
-
+          if (event.target !== playButton && event.target.tagName !== "I") {
+            if (event.target !== checkBox) checkBox.checked = !checkBox.checked;
             if (checkBox.checked) {
+              audItem = document.createElement("div");
+              audItem.classList.add("aud-item");
+              audItem.classList.add("prevent-select");
+              audItem.style.width = "50vw";
+              audItem.innerHTML = `
+          <form id="${file.name.replace(
+            /\s/g,
+            "_"
+          )}_form" class="timeline-audio-modifiers">
+            <button type="button" class="leftArrow">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <input type="text" class="file-name" value="${
+              file.name.length > 20
+                ? file.name.substring(0, 20) + "..."
+                : file.name
+            }" readonly />
+            <input
+              type="number"
+              name="audDuration"
+              placeholder="10s"
+            />
+            <button type="button" class="rightArrow">
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </form>
+        `;
+              // we don't need an active class in audio, just implement left, right, duration change
+              // add a duration change event listener
+              let audDuration = audItem.querySelector(
+                "input[name=audDuration]"
+              );
+              audDuration.addEventListener("change", function () {
+                let duration = audDuration.value;
+                if (duration === "") {
+                  duration = 10;
+                  audDuration.value = 10;
+                }
+                if (duration < 3) {
+                  duration = 3;
+                  audDuration.value = 3;
+                }
+                let audioWidth = duration * 5;
+                audItem.style.width = audioWidth + "vw";
+                // make it so that the text input is no longer selected
+                audDuration.blur();
+              });
+
+              // add a left arrow click event listener, which exchanges the audio element with the one before it
+              let leftArrow = audItem.querySelector(".leftArrow");
+              leftArrow.addEventListener("click", function () {
+                let previous = audItem.previousElementSibling;
+                if (previous) {
+                  audItem.parentNode.insertBefore(audItem, previous);
+                  console.log("left arrow clicked");
+                }
+              });
+
+              // add a right arrow click event listener, which exchanges the audio element with the one after it
+              let rightArrow = audItem.querySelector(".rightArrow");
+              rightArrow.addEventListener("click", function () {
+                let next = audItem.nextElementSibling;
+                if (next) {
+                  audItem.parentNode.insertBefore(next, audItem);
+                  console.log("right arrow clicked");
+                }
+              });
               audioList.appendChild(audItem);
             } else {
               audioList.removeChild(audItem);
-
-              // Iterate over audioList elements and set display to "flex"
-              for (let i = 0; i < audioList.children.length; i++) {
-                audioList.children[i].style.display = "flex";
-              }
             }
           }
         });
@@ -283,8 +404,13 @@ function displayFiles(files) {
 function exportProject() {
   // Open a custom dialog box to confirm the video format and resolution
   if (document.getElementById("image-grid-container").childElementCount == 0) {
-    // TODO: Show error of timeline empty
     alert("Please upload images to the project before exporting.");
+    return;
+  }
+
+  // show alert if timeline is empty
+  if (document.getElementById("imgContent").childElementCount == 0) {
+    alert("Please add image(s) to the timeline before exporting.");
     return;
   }
 
@@ -332,14 +458,52 @@ function exportProject() {
     }
 
     // Create a json object
-    // TODO: Add audio and images to the json object
+
+    // get all the image elements one by one, in order of occurrence, with their respective durations and transitions
+    let imageContent = document.getElementById("imgContent");
+    let images = [];
+    for (let i = 0; i < imageContent.children.length; i++) {
+      let image = imageContent.children[i];
+      let duration = image.querySelector("input[name=imgDuration]").value;
+      if (duration === "") {
+        duration = 5;
+        image.querySelector("input[name=imgDuration]").value = 5;
+      }
+      let transition = image.querySelector("input[name=imgTransition]").value;
+      // get source of the image, src, from the name of the form element which is child of image, after removing the _form suffix
+      let src = image.querySelector("form").id.replace("_form", "");
+      images.push({
+        file: src,
+        duration_ms: duration * 1000,
+        transition: transition,
+      });
+    }
+
+    // get all the audio elements one by one, in order of occurrence, with their respective durations
+    let audioContent = document.getElementById("audContent");
+    let audio = [];
+    for (let i = 0; i < audioContent.children.length; i++) {
+      let audioItem = audioContent.children[i];
+      let duration = audioItem.querySelector("input[name=audDuration]").value;
+      if (duration === "") {
+        duration = 10;
+        audioItem.querySelector("input[name=audDuration]").value = 5;
+      }
+      // get source of the audio, src, from the name of the form element, after removing the _form suffix
+      let src = audioItem.querySelector("form").id.replace("_form", "");
+      audio.push({
+        file: src,
+        duration_ms: duration * 1000,
+      });
+    }
+
     var project = {
       name: projectName,
       format: exportFormat,
       height: height,
       width: width,
-      images: [],
-      audio: [],
+      images: images,
+      audio: audio,
     };
 
     // write this json file into the textbox with id json
@@ -349,7 +513,27 @@ function exportProject() {
     // add a spinning loading icon to the submit button
     document.getElementById("submit").innerHTML +=
       '<i class="fas fa-spinner fa-spin"></i>';
-    document.getElementById("drop-zone").submit();
+    // document.getElementById("drop-zone").submit();
+
+    // submit the drop-zone form using fetch, and also use the selectedFiles array to send the files instead of the default form submission
+    var formData = new FormData();
+    formData.append("json", document.getElementById("json").value);
+    for (var i = 0; i < selectedFiles.length; i++) {
+      formData.append("file" + i, selectedFiles[i]);
+    }
+
+    fetch("/upload_file", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response)
+      .then((data) => {
+        // redirect to dashboard
+        window.location.href = "/dashboard";
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   });
 
   showResolution();
@@ -504,3 +688,45 @@ findAud.addEventListener("keydown", () => {
   let searchTerm = findAud.value;
   searchAudio(searchTerm.toLowerCase());
 });
+
+document.getElementById("transition-list-content").style.display = "none";
+document.getElementById("transition-list-placeholder").style.display = "flex";
+
+// for each element in the transition list, add a click event listener which sets the transition of the selected image
+let transitionList = document.getElementById("transition-list-container");
+for (let i = 0; i < transitionList.children.length; i++) {
+  transitionList.children[i].addEventListener("click", function () {
+    let activeImage = document.querySelector(".img-item.active");
+    if (activeImage) {
+      // set the value of the child form's imgTransition input to the transition name
+      activeImage.querySelector("input[name=imgTransition]").value =
+        transitionList.children[i].id;
+    }
+    // add the active class to the transition list element
+    for (let j = 0; j < transitionList.children.length; j++) {
+      transitionList.children[j].classList.remove("active");
+    }
+    transitionList.children[i].classList.add("active");
+  });
+}
+
+// function searchTransition(searchTerm) {
+//   let transDivs = document.querySelectorAll(".transition-item");
+
+//   transDivs.forEach((div) => {
+//     let transName = div.querySelector("img").id.toLowerCase();
+
+//     if (transName.includes(searchTerm)) {
+//       div.style.display = "flex";
+//     } else {
+//       div.style.display = "none";
+//     }
+//   });
+// }
+
+// let findTrans = document.getElementById("searchright1");
+// findTrans.addEventListener("keydown", () => {
+//   let searchTerm = findTrans.value;
+//   console.log(searchTerm);
+//   searchTransition(searchTerm.toLowerCase());
+// });

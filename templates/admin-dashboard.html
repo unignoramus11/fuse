@@ -59,6 +59,33 @@
         margin-top: 20px;
         justify-content: space-evenly;
       }
+
+      .card {
+        background-color: rgba(255, 255, 255, 0.75);
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .card-header {
+        background-color: transparent;
+        border-bottom: none;
+        padding: 1.5rem;
+      }
+
+      td {
+        border: none;
+      }
+
+      .logout {
+        justify-content: center;
+      }
+
+      .btn-primary {
+        width: fit-content;
+      }
+
     </style>
   </head>
 
@@ -76,7 +103,7 @@
                     <p class="text-sm mb-0 text-capitalize font-weight-bold">
                       Users
                     </p>
-                    <h5 class="font-weight-bolder mb-0">2,300</h5>
+                    <h5 class="font-weight-bolder mb-0">{{ n_users }}</h5>
                   </div>
                   <div
                     class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md"
@@ -98,7 +125,7 @@
                     <p class="text-sm mb-0 text-capitalize font-weight-bold">
                       Projects
                     </p>
-                    <h5 class="font-weight-bolder mb-0">103,430</h5>
+                    <h5 class="font-weight-bolder mb-0">{{ n_projects }}</h5>
                   </div>
                   <div
                     class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md"
@@ -130,6 +157,11 @@
                         <th
                           class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                         >
+                          Username
+                        </th>
+                        <th
+                          class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                        >
                           Name
                         </th>
                         <th
@@ -145,79 +177,48 @@
                       </tr>
                     </thead>
                     <tbody>
+                      {% for user in users %}
                       <tr>
                         <td>
                           <div class="d-flex px-2 py-1">
-                            <img
-                              src="{{ url_for('static', filename='img/team-4.jpg') }}"
-                              class="avatar avatar-sm me-3"
-                              alt="user1"
-                            />
                             <div
                               class="d-flex flex-column justify-content-center"
+                              style="margin-left: 10px"
                             >
-                              <h6 class="mb-0 text-sm">Mohit Singh</h6>
+                              <h6 class="mb-0 text-sm">{{ user[0] }}</h6>
                             </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            class="d-flex flex-column justify-content-center"
+                          >
+                            <h6 class="mb-0 text-sm">{{ user[1] }}</h6>
                           </div>
                         </td>
                         <td>
                           <p class="text-sm text-secondary mb-0">
-                            mohit@singh.com
+                            {{ user[2] }}
                           </p>
                         </td>
-                        <td class="align-middle text-center text-sm">67</td>
+                        <td class="align-middle text-center text-sm">
+                          {{ user[3] }}
+                        </td>
                       </tr>
-                      <!-- Add more rows as needed -->
-                      <tr>
-                        <td>
-                          <div class="d-flex px-2 py-1">
-                            <img
-                              src="{{ url_for('static', filename='img/team-3.jpg') }}"
-                              class="avatar avatar-sm me-3"
-                              alt="user1"
-                            />
-                            <div
-                              class="d-flex flex-column justify-content-center"
-                            >
-                              <h6 class="mb-0 text-sm">Arihant Tripathy</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <p class="text-sm text-secondary mb-0">
-                            arihant@tripathy.com
-                          </p>
-                        </td>
-                        <td class="align-middle text-center text-sm">68</td>
-                      </tr>
-                      <!-- Add more rows as needed -->
-                      <tr>
-                        <td>
-                          <div class="d-flex px-2 py-1">
-                            <img
-                              src="{{ url_for('static', filename='img/team-2.jpg') }}"
-                              class="avatar avatar-sm me-3"
-                              alt="user1"
-                            />
-                            <div
-                              class="d-flex flex-column justify-content-center"
-                            >
-                              <h6 class="mb-0 text-sm">Aviral Gupta</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <p class="text-sm text-secondary mb-0">avi@lol.com</p>
-                        </td>
-                        <td class="align-middle text-center text-sm">69</td>
-                      </tr>
-                      <!-- Add more rows as needed -->
+                      {% endfor %}
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- add a logout button without any card surrounding it or background, just a button -->
+      <div class="container-fluid py-4">
+        <div class="row logout">
+            <a href="{{ url_for('signout') }}" class="btn btn-primary">Logout</a>
         </div>
       </div>
     </main>
