@@ -27260,7 +27260,7 @@ pre[class*="language-"] {
 }
 
 .newProjectCard {
-  height: calc(max(123px, 72.5%));
+  height: 100%;
   width: 100%;
   border: 1px dashed grey;
   border-radius: 13px;

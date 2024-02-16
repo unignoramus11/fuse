@@ -513,27 +513,7 @@ function exportProject() {
     // add a spinning loading icon to the submit button
     document.getElementById("submit").innerHTML +=
       '<i class="fas fa-spinner fa-spin"></i>';
-    // document.getElementById("drop-zone").submit();
-
-    // submit the drop-zone form using fetch, and also use the selectedFiles array to send the files instead of the default form submission
-    var formData = new FormData();
-    formData.append("json", document.getElementById("json").value);
-    for (var i = 0; i < selectedFiles.length; i++) {
-      formData.append("file" + i, selectedFiles[i]);
-    }
-
-    fetch("/upload_file", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response)
-      .then((data) => {
-        // redirect to dashboard
-        window.location.href = "/dashboard";
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    document.getElementById("drop-zone").submit();
   });
 
   showResolution();
@@ -710,23 +690,32 @@ for (let i = 0; i < transitionList.children.length; i++) {
   });
 }
 
-// function searchTransition(searchTerm) {
-//   let transDivs = document.querySelectorAll(".transition-item");
+function searchTransition(searchTerm) {
+  let transDivs = document.querySelectorAll(".transition-item");
 
-//   transDivs.forEach((div) => {
-//     let transName = div.querySelector("img").id.toLowerCase();
+  transDivs.forEach((div) => {
+    let transName = div.id.toLowerCase();
 
-//     if (transName.includes(searchTerm)) {
-//       div.style.display = "flex";
-//     } else {
-//       div.style.display = "none";
-//     }
-//   });
+    if (transName.includes(searchTerm)) {
+      div.style.display = "flex";
+    } else {
+      div.style.display = "none";
+    }
+  });
+}
+
+let findTrans = document.getElementById("searchright1");
+findTrans.addEventListener("keydown", () => {
+  let searchTerm = findTrans.value;
+  searchTransition(searchTerm.toLowerCase());
+});
+
+// function profilePic() {
+//   let randomId = Math.floor(Math.random() * 1000);
+//   console.log(randomId);
+//   let url = `https://picsum.photos/id/${randomId}/200/200`;
+//   return url;
 // }
 
-// let findTrans = document.getElementById("searchright1");
-// findTrans.addEventListener("keydown", () => {
-//   let searchTerm = findTrans.value;
-//   console.log(searchTerm);
-//   searchTransition(searchTerm.toLowerCase());
-// });
+// const picLink = profilePic();
+// document.getElementById('profileImg1').src = picLink;
