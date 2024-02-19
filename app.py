@@ -159,6 +159,10 @@ def dashboard():
 
     # get a random image from unplash and add it to the static/pfp folder with the name as username
     # if the image already exists, don't download it again
+            
+    if not os.path.exists("static/pfp"):
+        os.makedirs("static/pfp")
+
     if not os.path.exists(f"static/pfp/{user[1]}.jpg"):
         import requests
         from PIL import Image
