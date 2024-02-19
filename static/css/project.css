@@ -357,7 +357,6 @@
   overflow-y: auto;
   border-radius: 10px;
   text-align: center;
-  margin-top: 20px;
   border: 2px solid #1f1d36;
   display: flex;
   flex-direction: column;
@@ -395,7 +394,7 @@
 
 /* Audio */
 #audio-list {
-  height: 37vh;
+  height: calc(40vh);
   overflow-y: auto;
   border-radius: 10px;
   text-align: center;

@@ -1,3 +1,6 @@
+var toSubmit = false; // Flag to track if the form is ready to be submitted
+var activeUploads = 0; // Number of active uploads
+
 // Set a random project name with an adjective and an animal
 let projectInput = document.getElementById("projectName");
 projectInput.placeholder = "Loading...";
@@ -39,15 +42,12 @@ for (var i = 0; i < searchInput.length; i++) {
   });
 }
 
-let selectedFiles = [];
-
 // Drag and drop support
 let dropZone = document.getElementById("drop-zone");
 let fileInput = document.getElementById("docpicker");
 let fileList = document.getElementById("image-list");
 
 dropZone.addEventListener("dragover", function (e) {
-  e.preventDefault();
   dropZone.style.border = "2px dashed #3f3351";
 });
 
@@ -56,20 +56,16 @@ dropZone.addEventListener("dragleave", function () {
 });
 
 dropZone.addEventListener("drop", function (e) {
-  e.preventDefault();
   dropZone.style.border = "";
+  e.preventDefault();
 
   var files = e.dataTransfer.files;
   displayFiles(files);
-  // extend the selectedFiles array with the new files
-  selectedFiles = selectedFiles.concat(files);
 });
 
 fileInput.addEventListener("change", function (e) {
   var files = e.target.files;
   displayFiles(files);
-  // extend the selectedFiles array with the new files
-  selectedFiles = selectedFiles.concat(files);
 });
 
 // Click event to trigger file input
@@ -79,7 +75,6 @@ dropZone.addEventListener("click", function () {
 
 // Sorting images and audio in their respective boxes
 function displayFiles(files) {
-  // Iterate over the files
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
 
@@ -114,29 +109,28 @@ function displayFiles(files) {
             )})`;
 
             timelineImageContainer.innerHTML = `
- <form id="${file.name.replace(
-   /\s/g,
-   "_"
- )}_form" class="timeline-image-modifiers">
-    <button type="button" class="leftArrow">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-    <input
-      type="number"
-      name="imgDuration"
-      placeholder="5s"
-    />
-    <input
-      type="text"
-      name="imgTransition"
-      value="fade"
-      hidden
-    />
-    <button type="button" class="rightArrow">
-      <i class="fa-solid fa-arrow-right"></i>
-    </button>
-  </form>
-`;
+              <form id="${file.name.replace(
+                /\s/g,
+                "_"
+              )}_form" class="timeline-image-modifiers">
+                  <button type="button" class="leftArrow">
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                  <input
+                    type="number"
+                    name="imgDuration"
+                    placeholder="5s"
+                  />
+                  <input
+                    type="text"
+                    name="imgTransition"
+                    value="fade"
+                    hidden
+                  />
+                  <button type="button" class="rightArrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </form>`;
             // add a click event listener to the image element which toggles the active class
             timelineImageContainer.addEventListener("click", function (e) {
               if (
@@ -150,33 +144,27 @@ function displayFiles(files) {
                 }
                 timelineImageContainer.classList.toggle("active");
 
-                // if no image is active. hide the transition list content id div and make the transition list placeholder id visible
+                // if no image is active or the activated image is removed from timeline. hide the transition list content id div
                 if (!timelineImageContainer.classList.contains("active")) {
-                  document.getElementById(
-                    "transition-list-content"
-                  ).style.display = "none";
-                  document.getElementById(
-                    "transition-list-placeholder"
-                  ).style.display = "flex";
-                } else {
-                  document.getElementById(
-                    "transition-list-content"
-                  ).style.display = "flex";
-                  document.getElementById(
-                    "transition-list-placeholder"
-                  ).style.display = "none";
+                  document.getElementById("transition-list-content").style.display = "none";
+                  document.getElementById("transition-list-placeholder").style.display = "flex";
+                }
+                else {
+                  document.getElementById("transition-list-content").style.display = "flex";
+                  document.getElementById("transition-list-content").style.justifyContent = "center";
+                  document.getElementById("transition-list-content").style.alignItems = "center";
+                  document.getElementById("transition-list-placeholder").style.display = "none";
 
-                  // from the active image's form, get the value of the imgTransition input and set the transition list element with the same id to active
+                  // Set the transition list element to active
                   let activeImage = document.querySelector(".img-item.active");
                   if (activeImage) {
-                    // get transition id from the form
-                    let transitionName = activeImage.querySelector(
-                      "input[name=imgTransition]"
-                    ).value;
+                    // Getting transition id from the form
+                    let transitionName = activeImage.querySelector("input[name=imgTransition]").value;
                     for (let j = 0; j < transitionList.children.length; j++) {
                       if (transitionList.children[j].id === transitionName) {
                         transitionList.children[j].classList.add("active");
-                      } else {
+                      }
+                      else {
                         transitionList.children[j].classList.remove("active");
                       }
                     }
@@ -186,9 +174,7 @@ function displayFiles(files) {
             });
 
             // add a duration change event listener
-            let imgDuration = timelineImageContainer.querySelector(
-              "input[name=imgDuration]"
-            );
+            let imgDuration = timelineImageContainer.querySelector("input[name=imgDuration]");
             imgDuration.addEventListener("change", function () {
               let duration = imgDuration.value;
               if (duration === "") {
@@ -402,18 +388,16 @@ function displayFiles(files) {
 
 // Submit project for processing
 function exportProject() {
+  // Alert if timeline is empty
+  if (
+    !document.getElementById("image-grid-container").childElementCount ||
+    !document.getElementById("imgContent").childElementCount
+  ) {
+    alert("Please add at least one image to the timeline before exporting.");
+    return;
+  }
+
   // Open a custom dialog box to confirm the video format and resolution
-  if (document.getElementById("image-grid-container").childElementCount == 0) {
-    alert("Please upload images to the project before exporting.");
-    return;
-  }
-
-  // show alert if timeline is empty
-  if (document.getElementById("imgContent").childElementCount == 0) {
-    alert("Please add image(s) to the timeline before exporting.");
-    return;
-  }
-
   var dialog_container = document.getElementById("dialog-container");
   dialog_container.setAttribute("style", "display: block;");
 
@@ -513,7 +497,10 @@ function exportProject() {
     // add a spinning loading icon to the submit button
     document.getElementById("submit").innerHTML +=
       '<i class="fas fa-spinner fa-spin"></i>';
-    document.getElementById("drop-zone").submit();
+
+    // set the toSubmit flag to true
+    toSubmit = true;
+    submitProject();
   });
 
   showResolution();
@@ -655,7 +642,7 @@ function searchAudio(searchTerm) {
   audioDivs.forEach((div) => {
     let altText = div.querySelector("audio").alt.toLowerCase();
 
-    if (altText.includes(searchTerm)) {
+    if (altTeuploaderxt.includes(searchTerm)) {
       div.style.display = "flex";
     } else {
       div.style.display = "none";
@@ -672,7 +659,7 @@ findAud.addEventListener("keydown", () => {
 document.getElementById("transition-list-content").style.display = "none";
 document.getElementById("transition-list-placeholder").style.display = "flex";
 
-// for each element in the transition list, add a click event listener which sets the transition of the selected image
+// make the transition selection work
 let transitionList = document.getElementById("transition-list-container");
 for (let i = 0; i < transitionList.children.length; i++) {
   transitionList.children[i].addEventListener("click", function () {
@@ -710,12 +697,43 @@ findTrans.addEventListener("keydown", () => {
   searchTransition(searchTerm.toLowerCase());
 });
 
-// function profilePic() {
-//   let randomId = Math.floor(Math.random() * 1000);
-//   console.log(randomId);
-//   let url = `https://picsum.photos/id/${randomId}/200/200`;
-//   return url;
-// }
+// create a function to handle the form submission if the toSubmit flag is true
+function submitProject() {
+  if (toSubmit && activeUploads == 0) {
+    document.getElementById("drop-zone").submit();
+  }
+}
 
-// const picLink = profilePic();
-// document.getElementById('profileImg1').src = picLink;
+// Create a jQuery object for the uploader element
+$(document).ready(function () {
+  var uploader = $("#drop-zone");
+  // Initialize the dmUploader plugin
+  uploader.dmUploader({
+    url: "/upload_files",
+    onInit: function () {
+      // console.log("Uploader initialized");
+    },
+    onNewFile: function (id, file) {
+      console.log("New file added to queue, id:", id);
+      activeUploads++;
+    },
+    onUploadProgress: function (id, percent) {
+      console.log("Upload progress for file id", id, ":", percent, "%");
+    },
+    onUploadSuccess: function (id, data) {
+      console.log(
+        "Upload finished for file id",
+        id,
+        ", server response:",
+        data
+      );
+      activeUploads--;
+      submitProject();
+    },
+  });
+
+  // When a file is added to the queue, upload it immediately
+  uploader.on("newFile", function (id, file) {
+    uploader.dmUploader("start", id);
+  });
+});

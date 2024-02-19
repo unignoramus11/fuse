@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is an app created by team Code Fusion for the Introduction to Software Systems course at IIIT Hyderabad. This app ia a platform allowing users to create video slideshows from their photos and audio, along with a custom audio library too. The app is built using Flask, HTML, CSS, JavaScript and MySQL.
+This is an app created by team Code Fusion for the Introduction to Software Systems course at IIIT Hyderabad. This app ia a platform allowing users to create video slideshows from their photos and audio, along with a custom audio library too. The app is built using Flask, HTML, CSS, Bootstrap, JavaScript, jQuery and MySQL.
 
 ## Installation
 

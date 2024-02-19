@@ -1,9 +1,11 @@
+import argparse
 import ffmpeg
 import json
 from database import removeTask
 
 
 def create_video(username, project_id):
+    print("Creating video for project", project_id)
     # Define paths
     base_path = "uploads/" + username + "/" + project_id + "/"
     json_file = base_path + "project_data.json"
@@ -90,6 +92,10 @@ def create_video(username, project_id):
     removeTask(project_id)
 
 
-username = "admin"
-project_id = "1"
-create_video(username, project_id)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Create a video.')
+    parser.add_argument('username', type=str, help='The username.')
+    parser.add_argument('project_id', type=str, help='The project ID.')
+    args = parser.parse_args()
+
+    create_video(args.username, args.project_id)
