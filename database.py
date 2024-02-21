@@ -192,7 +192,7 @@ def authenticate(username, password):
         "SELECT * FROM users WHERE username = %(username)s AND password = %(password)s",
         {"username": username, "password": password},
     )
-    result = mycursor.fetchone() != None
+    result = mycursor.fetchone() is not None
     mycursor.close()
     mydb.close()
 
