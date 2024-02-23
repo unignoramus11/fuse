@@ -77,23 +77,6 @@ dropZone.addEventListener("click", function () {
 
 // Sorting images and audio in their respective boxes
 function displayFiles(files) {
-  // console.log(files);
-
-  // // access all files from ../static/audio and create a file object for each one
-  // fetch("/get_audio_files")
-  //   .then((response) => response.json())
-  //   .then((audioFiles) => {
-  //     for (let i = 0; i < audioFiles.length; i++) {
-  //       let file = audioFiles[i];
-  //       file.type = "audio/";
-  //       files.push(file);
-  //     }
-  //     addFiles(files);
-  //   });
-  // TODO: delete this shit
-
-  // console.log(files);
-
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
 
@@ -770,7 +753,7 @@ function searchAudio(searchTerm) {
   audioDivs.forEach((div) => {
     let altText = div.querySelector("audio").alt.toLowerCase();
 
-    if (altTeuploaderxt.includes(searchTerm)) {
+    if (altText.includes(searchTerm)) {
       div.style.display = "flex";
     } else {
       div.style.display = "none";
@@ -779,7 +762,10 @@ function searchAudio(searchTerm) {
 }
 
 let findAud = document.getElementById("searchright2");
-findAud.addEventListener("keydown", () => {
+findAud.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+  }
   let searchTerm = findAud.value;
   searchAudio(searchTerm.toLowerCase());
 });
@@ -821,7 +807,10 @@ function searchTransition(searchTerm) {
 }
 
 let findTrans = document.getElementById("searchright1");
-findTrans.addEventListener("keydown", () => {
+findTrans.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+  }
   let searchTerm = findTrans.value;
   searchTransition(searchTerm.toLowerCase());
 });
@@ -893,169 +882,43 @@ function getPreview() {
     });
 }
 
-function addSample() {
-  // fetch the sample audio files from get_audio_files endpoint and store it to sample_files
-  var sample_files = [];
-  fetch("/get_sample_audio")
-    .then((response) => response.json())
-    .then((audioFiles) => {
-      for (let i = 0; i < audioFiles.length; i++) {
-        let file = audioFiles[i];
-        sample_files.push(file);
-      }
+// once the page has loaded, fetch the sample audio and image list
+// first get the names of the sample audio files from the sample-audio id textbox
+// then get the names of the sample image files from the sample-images id textbox
+// then fetch the audio and image files from the server and create a list of javascript file objects for these all of these files
+// finally, call the displayFiles function with the list of file objects
 
-      console.log(sample_files);
+window.onload = () => {
+  let audioNames = document.getElementById("sample-audio").value.split(",");
+  let imageNames = document.getElementById("sample-images").value.split(",");
 
-      for (var i = 0; i < sample_files.length; i++) {
-        var file = sample_files[i];
+  let audioFiles = [];
+  let imageFiles = [];
 
-        console.log(file);
-        // Get the audio list container
-        audioListContainer = document.getElementById("audio-list-container");
-        var audioItem = document.createElement("div");
-        audioItem.classList.add("audio-item", "prevent-select");
-
-        var checkBox = document.createElement("input");
-        checkBox.type = "checkbox";
-        checkBox.classList.add("audio-checkbox");
-        audioItem.append(checkBox);
-
-        var audio = document.createElement("audio");
-        audio.src = URL.createObjectURL(file);
-        audio.alt = file.name;
-
-        // Show the file name beside the audio
-        var audioName = document.createElement("p");
-        // set the text of the p element to the file name after replacing _ with space
-        audioName.textContent = file.name.replace(/\_/g, " ");
-        audioItem.appendChild(audioName);
-
-        // Custom audio controls
-        var audioControls = document.createElement("div");
-        audioControls.classList.add("audio-controls");
-        var playButton = document.createElement("button");
-        playButton.type = "button";
-        playButton.classList.add("play-button");
-        playButton.innerHTML =
-          '<i class="fas fa-play" style="color: white;"></i>';
-
-        ((audio, playButton) => {
-          playButton.addEventListener("click", function () {
-            if (audio.paused) {
-              audio.play();
-              // Change it into play button
-              playButton.innerHTML =
-                '<i class="fas fa-pause" style="color: white;"></i>';
-            } else {
-              audio.pause();
-              // Change it into pause button
-              playButton.innerHTML =
-                '<i class="fas fa-play" style="color: white;"></i>';
-            }
-          });
-        })(audio, playButton);
-
-        // Change to play button when the audio ends
-        ((audio, playButton) => {
-          audio.addEventListener("ended", function () {
-            playButton.innerHTML =
-              '<i class="fas fa-play" style="color: white;"></i>';
-          });
-        })(audio, playButton);
-
-        audioControls.appendChild(playButton);
-        audioItem.appendChild(audioControls);
-
-        // Append the audio to the audio list container
-        audioListContainer.appendChild(audioItem);
-        audioItem.appendChild(audio);
-
-        ((file, audioItem, checkBox, playButton) => {
-          // create an aud-item for timeline similar to the img-item
-          let audItem;
-
-          let audioList = document.getElementById("audContent");
-          audioItem.addEventListener("click", function (event) {
-            if (event.target !== playButton && event.target.tagName !== "I") {
-              if (event.target !== checkBox)
-                checkBox.checked = !checkBox.checked;
-              if (checkBox.checked) {
-                audItem = document.createElement("div");
-                audItem.classList.add("aud-item");
-                audItem.classList.add("prevent-select");
-                audItem.style.width = "50vw";
-                audItem.innerHTML = `
-          <form id="${file.name.replace(
-            /\s/g,
-            "_"
-          )}_form" class="timeline-audio-modifiers">
-            <button type="button" class="leftArrow">
-              <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <input type="text" class="file-name" value="${
-              file.name.length > 20
-                ? file.name.substring(0, 20) + "..."
-                : file.name
-            }" readonly />
-            <input
-              type="number"
-              name="audDuration"
-              placeholder="10s"
-            />
-            <button type="button" class="rightArrow">
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </form>
-        `;
-                // we don't need an active class in audio, just left, right, duration change
-                // add a duration change event listener
-                let audDuration = audItem.querySelector(
-                  "input[name=audDuration]"
-                );
-                audDuration.addEventListener("change", function () {
-                  let duration = audDuration.value;
-                  if (duration === "") {
-                    duration = 10;
-                    audDuration.value = 10;
-                  }
-                  if (duration < 3) {
-                    duration = 3;
-                    audDuration.value = 3;
-                  }
-                  let audioWidth = duration * 5;
-                  audItem.style.width = audioWidth + "vw";
-                  // make it so that the text input is no longer selected
-                  audDuration.blur();
-                  previewProject();
-                });
-
-                // add a left arrow click event listener, which exchanges the audio element with the one before it
-                let leftArrow = audItem.querySelector(".leftArrow");
-                leftArrow.addEventListener("click", function () {
-                  let previous = audItem.previousElementSibling;
-                  if (previous) {
-                    audItem.parentNode.insertBefore(audItem, previous);
-                  }
-                });
-
-                // add a right arrow click event listener, which exchanges the audio element with the one after it
-                let rightArrow = audItem.querySelector(".rightArrow");
-                rightArrow.addEventListener("click", function () {
-                  let next = audItem.nextElementSibling;
-                  if (next) {
-                    audItem.parentNode.insertBefore(next, audItem);
-                  }
-                });
-                audioList.appendChild(audItem);
-              } else {
-                audioList.removeChild(audItem);
-              }
-              previewProject();
-            }
-          });
-        })(file, audioItem, checkBox, playButton);
-      }
+  if (audioNames.length != 0 && audioNames[0] != "") {
+    audioNames.forEach((name) => {
+      fetch(`/get_samples/audio/${name}`)
+        .then((response) => response.blob())
+        .then((blob) => {
+          audioFiles.push(new File([blob], name, { type: "audio/mpeg" }));
+          if (audioFiles.length === audioNames.length) {
+            displayFiles(audioFiles);
+          }
+        });
     });
-}
+  }
 
-// addSample();
+  // get the image files from the server using the /get_samples/<media_type>/<filename> endpoint
+  if (imageNames.length != 0 && imageNames[0] != "") {
+    imageNames.forEach((name) => {
+      fetch(`/get_samples/images/${name}`)
+        .then((response) => response.blob())
+        .then((blob) => {
+          imageFiles.push(new File([blob], name, { type: "image/png" }));
+          if (imageFiles.length === imageNames.length) {
+            displayFiles(imageFiles);
+          }
+        });
+    });
+  }
+};

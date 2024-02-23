@@ -76,14 +76,14 @@
           <div class="position-relative">
             {% if project[3] != "" %}
             <a class="d-block shadow-xl border-radius-xl">
-              <img src="{{ url_for('uploaded_file', username=username, project_id=project[0], media_type="images", filename=project[3]) }}" alt="img-blur-shadow"
+              <img src="{{ url_for('get_thumbnail', username=username, project_id=project[0], filename=project[3]) }}" alt="{{ project[1] }}-thumbnail"
                 class="img-fluid shadow border-radius-xl" 
                 style="height: 25vh; object-fit: cover; object-position: center; width: 100%;"
                 />
             </a>
             {% else %}
             <a class="d-block shadow-xl border-radius-xl">
-              <img src="{{ url_for('static', filename='img/home-decor-2.jpg') }}" alt="img-blur-shadow"
+              <img src="{{ url_for('static', filename='img/processing.gif') }}" alt="img-blur-shadow"
                 class="img-fluid shadow border-radius-xl"
                 style="height: 25vh; object-fit: cover; object-position: center; width: 100%;"
                 />

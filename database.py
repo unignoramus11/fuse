@@ -1,3 +1,5 @@
+import json
+import re
 from dotenv import dotenv_values
 import mysql.connector
 
@@ -22,9 +24,13 @@ def createDatabase():
     mycursor.execute(
         "INSERT IGNORE INTO users (username, password) VALUES ('admin', 'admin')"
     )
-    # mycursor.execute(
-    #     "CREATE TABLE IF NOT EXISTS files (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), filename VARCHAR(255), file BLOB, FOREIGN KEY (username ) REFERENCES users(username))"
-    # )
+    mycursor.execute(
+        "CREATE TABLE IF NOT EXISTS files (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), filename VARCHAR(255), file LONGBLOB, FOREIGN KEY (username) REFERENCES users(username))"
+    )
+
+    mycursor.execute(
+        "CREATE TABLE IF NOT EXISTS videos (id INT AUTO_INCREMENT PRIMARY KEY, project_id INT, video LONGBLOB, json_data TEXT, FOREIGN KEY (project_id) REFERENCES projects(id))"
+    )
 
     mydb.commit()
     mycursor.close()
@@ -100,32 +106,54 @@ def getAdminView():
     return result
 
 
-# def getFile(username, filename):
-#     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
-#     mycursor = mydb.cursor()
-#     mycursor.execute("USE fuse")
-#     mycursor.execute(
-#         "SELECT * FROM files WHERE username = %(username)s AND filename = %(filename)s",
-#         {"username": username, "filename": filename},
-#     )
-#     result = mycursor.fetchone()
-#     mycursor.close()
-#     mydb.close()
+def getFile(username, filename):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT * FROM files WHERE username = %(username)s AND filename = %(filename)s",
+        {"username": username, "filename": filename},
+    )
+    result = mycursor.fetchone()
+    mycursor.close()
+    mydb.close()
 
-#     return result[3]
+    return result
 
 
-# def saveFile(username, filename, file):
-#     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
-#     mycursor = mydb.cursor()
-#     mycursor.execute("USE fuse")
-#     mycursor.execute(
-#         "INSERT INTO files (username, filename, file) VALUES (%(username)s, %(filename)s, %(file)s)",
-#         {"username": username, "filename": filename, "file": file},
-#     )
-#     mydb.commit()
-#     mycursor.close()
-#     mydb.close()
+def getFiles(username):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT * FROM files WHERE username = %(username)s",
+        {"username": username},
+    )
+    result = mycursor.fetchall()
+    mycursor.close()
+    mydb.close()
+
+    return result
+
+
+def saveFile(username, filename, file):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+
+    # if file with the same name exists, add a number to the end of the filename and try again
+    i = 1
+    while getFile(username, filename):
+        filename = f"{filename.split('.')[0]}_{i}.{filename.split('.')[1]}"
+        i += 1
+
+    mycursor.execute(
+        "INSERT INTO files (username, filename, file) VALUES (%(username)s, %(filename)s, %(file)s)",
+        {"username": username, "filename": filename, "file": file},
+    )
+    mydb.commit()
+    mycursor.close()
+    mydb.close()
 
 
 def getUser(username):
@@ -282,6 +310,82 @@ def getStats():
     mydb.close()
 
     return n_users, n_projects
+
+
+def saveVideo(project_id, video, json_data):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "INSERT INTO videos (project_id, video, json_data) VALUES (%(project_id)s, %(video)s, %(json_data)s)",
+        {"project_id": project_id, "video": video, "json_data": json_data},
+    )
+    mydb.commit()
+    mycursor.close()
+    mydb.close()
+
+
+def getVideo(project_id):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT * FROM videos WHERE project_id = %(project_id)s",
+        {"project_id": project_id},
+    )
+    result = mycursor.fetchone()
+    mycursor.close()
+    mydb.close()
+
+    return result
+
+
+def getThumbnail(project_id):
+    # get the first image present int the json file of the project in video table
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT json_data FROM videos WHERE project_id = %(project_id)s",
+        {"project_id": project_id},
+    )
+    result = mycursor.fetchone()
+    mycursor.close()
+    mydb.close()
+
+    if result is None:
+        return None
+    
+    result = result[0]
+
+    result = json.loads(result)
+    thumbnail_file_name = result["images"][0]["file"]
+
+    # get the username of the project
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT user_username FROM projects WHERE id = %(project_id)s",
+        {"project_id": project_id},
+    )
+    username = mycursor.fetchone()[0]
+    mycursor.close()
+    mydb.close()
+
+    # get the file from the files table
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute(
+        "SELECT * FROM files WHERE username = %(username)s AND filename = %(filename)s",
+        {"username": username, "filename": thumbnail_file_name},
+    )
+    result = mycursor.fetchone()
+    mycursor.close()
+    mydb.close()
+
+    return result
 
 
 createDatabase()

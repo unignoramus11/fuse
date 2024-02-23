@@ -5,7 +5,6 @@ from flask import (
     render_template,
     request,
     send_from_directory,
-    jsonify
 )
 from dotenv import dotenv_values
 import os
@@ -138,14 +137,30 @@ def dashboard():
     for i in range(len(projects)):
         project_id = projects[i][0]
         username = user[1]
-        if os.path.exists(f"uploads/{username}/{project_id}/images"):
-            images = os.listdir(f"uploads/{username}/{project_id}/images")
-            if images:
-                projects[i] = projects[i] + (images[0],)
-            else:
-                projects[i] = projects[i] + ("",)
+        # if os.path.exists(f"uploads/{username}/{project_id}/thumbnail"):
+        #     images = os.listdir(f"uploads/{username}/{project_id}/thumbnail")
+        #     if images:
+        #         projects[i] = projects[i] + (images[0],)
+        #     else:
+        #         projects[i] = projects[i] + ("",)
+        # else:
+        #     projects[i] = projects[i] + ("",)
+
+        thumbnail = database.getThumbnail(project_id)
+        if thumbnail:
+            # now check if the thumbnail is in the folder, name of thumbnail is thumbnail and format is thumbnail[2].split(".")[-1]
+            thumb_name = f"thumbnail.{thumbnail[2].split('.')[-1]}"
+            if not os.path.exists(f"uploads/{username}/{project_id}/{thumb_name}"):
+                if not os.path.exists(f"uploads/{username}/{project_id}"):
+                    if not os.path.exists(f"uploads/{username}"):
+                        os.makedirs(f"uploads/{username}")
+                    os.makedirs(f"uploads/{username}/{project_id}")
+                with open(f"uploads/{username}/{project_id}/{thumb_name}", "wb") as f:
+                    f.write(thumbnail[-1])
+            projects[i] = projects[i] + (thumb_name,)
         else:
             projects[i] = projects[i] + ("",)
+
     # also check if the project is in the tasks table (still being processed)
     # and add a flag to the tuple using getTaskByProjectID
     for i in range(len(projects)):
@@ -216,16 +231,21 @@ Please use a desktop to access this feature.",
         os.system(f"cp {os.path.join(app.static_folder, 'audio')}" +
                   f"/{file} uploads/{user[1]}/-1/audio/{file}")
 
-    audio_files = os.listdir(os.path.join(app.static_folder, 'audio'))
+    # get all the existing images and audio files from the database and copy
+    # them to username/-1/images and username/-1/audio
+    files = database.getFiles(user[1])
+    for file in files:
+        if file[2].split(".")[-1] in ['apng', 'avif', 'bmp', 'gif', 'ico', 'cur', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'png', 'svg', 'webp']:
+            with open(f"uploads/{user[1]}/-1/images/{file[2]}", "wb") as f:
+                f.write(file[3])
+        else:
+            with open(f"uploads/{user[1]}/-1/audio/{file[2]}", "wb") as f:
+                f.write(file[3])
 
-    return render_template("project-editor.html", name=user[2], audio_files=audio_files)
+    images = ','.join(os.listdir(f"uploads/{user[1]}/-1/images"))
+    audio = ','.join(os.listdir(f"uploads/{user[1]}/-1/audio"))
 
-
-@app.route('/get_sample_audio')
-def get_sample_audio():
-    # Send the audio files from the static/audio folder to the user
-    audio_files = os.listdir(os.path.join(app.static_folder, 'audio'))
-    return jsonify(audio_files)
+    return render_template("project-editor.html", name=user[2], images=images, audio=audio)
 
 
 @app.route("/submit", methods=["POST"])
@@ -261,28 +281,21 @@ def submit():
     with open(f"uploads/{username}/{project_id}/project_data.json", "w") as json_file:
         json.dump(project_json, json_file)
 
-    # get the files from the uploads/username folder and move them to
-    # the uploads/username/project_id folder
-    # move the images to uploads/username/project_id/images
-    # move the audio to uploads/username/project_id/audio
-
     os.makedirs(f"uploads/{username}/{project_id}/images")
     os.makedirs(f"uploads/{username}/{project_id}/audio")
 
-    # go to the uploads/username/images folder and copy all the files to
-    # the uploads/username/project_id/images folder
-    for file in os.listdir(f"uploads/{username}/images"):
+    for file in os.listdir(f"uploads/{username}/-1/images"):
         os.system(
-            f"cp uploads/{username}/images/{file} uploads/{username}/{project_id}/images/{file}")
-    # go to the uploads/username/audio folder and copy all the files to
-    # the uploads/username/project_id/audio folder
-    for file in os.listdir(f"uploads/{username}/audio"):
-        os.system(
-            f"cp uploads/{username}/audio/{file} uploads/{username}/{project_id}/audio/{file}")
+            f"cp uploads/{username}/\"-1\"/images/{file} uploads/{username}/\"{project_id}\"/images/{file}")
 
-    # create a new thread to create the video
+    for file in os.listdir(f"uploads/{username}/-1/audio"):
+        os.system(
+            f"cp uploads/{username}/\"-1\"/audio/{file} uploads/{username}/\"{project_id}\"/audio/{file}")
+
     thread = Thread(target=create_video, args=(username, str(project_id)))
     thread.start()
+
+    os.system(f"rm -rf uploads/{username}/\"-1\"")
 
     return redirect(url_for("dashboard"))
 
@@ -330,13 +343,11 @@ def preview():
 
     # go to the uploads/username/images folder and copy all the files to
     # the uploads/username/project_id/images folder
-    print("reached our moment of truth")
     for file in os.listdir(f"uploads/{username}/images"):
         os.system(
             f"cp uploads/{username}/images/{file} uploads/{username}/\"{project_id}\"/images/{file}")
     # go to the uploads/username/audio folder and copy all the files to
     # the uploads/username/project_id/audio folder
-    print("reached our moment of truth 2")
     for file in os.listdir(f"uploads/{username}/audio"):
         os.system(
             f"cp uploads/{username}/audio/{file} uploads/{username}/\"{project_id}\"/audio/{file}")
@@ -401,6 +412,10 @@ def upload_files():
                 + file.name
                 + "! Please upload an image or audio file."
             )
+        # read the file and save it to the database
+        file.seek(0)
+        file = file.read()
+        database.saveFile(username, fname, file)
 
     return "Files successfully uploaded", 200
 
@@ -442,6 +457,7 @@ def uploaded_file(username, project_id, media_type, filename):
 
 @app.route("/download/<username>/<project_id>")
 def download(username, project_id):
+    database.getThumbnail(project_id)
     # first check if user is authenticated
     token = request.cookies.get("token")
     if not token:
@@ -469,21 +485,32 @@ def download(username, project_id):
             )
         )
 
-    # get the video name and format from json file in the project folder
-    with open(f"uploads/{username}/{project_id}/project_data.json") as json_file:
-        project_json = json.load(json_file)
-        project_name = project_json["name"]
-        video_format = project_json["format"]
-
-    video_name = f"{project_name}.{video_format}"
-    # check if the video exists
-    if not os.path.exists(f"uploads/{username}/{project_id}/{video_name}"):
+    result = database.getVideo(project_id)
+    if not result:
         return redirect(
             url_for(
                 "error", error="The video does not exist. Please try again later.")
         )
+    video_blob, json_data = result[2], result[3]
+
+    # Parse the json data to get the video name and format
+    data = json.loads(json_data)
+    video_name = data['name']
+    video_format = data['format']
+
+    # Create the directory if it doesn't exist
+    # directory is uploads/username/project_id
+    directory = f"uploads/{username}/{project_id}"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Write the video blob to a file
+    video_path = os.path.join(directory, f'{video_name}.{video_format}')
+    with open(video_path, 'wb') as f:
+        f.write(video_blob)
+
     return send_from_directory(
-        f"uploads/{username}/{project_id}", video_name, as_attachment=True
+        directory, f"{video_name}.{video_format}", as_attachment=True
     )
 
 
@@ -558,6 +585,50 @@ def get_preview():
         )
     else:
         return "The preview does not exist.", 400
+
+
+@app.route("/get_thumbnail/<username>/<project_id>/<filename>")
+def get_thumbnail(username, project_id, filename):
+    # first check if user is authenticated
+    token = request.cookies.get("token")
+    if not token:
+        return "Not authorised.", 400
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return "Not authorised.", 400
+    if token["username"] == "admin":
+        return "Not authorised.", 400
+
+    # check if user is the owner of the project
+    if token["username"] != username:
+        return "Not authorised.", 400
+
+    # return the thumbnail
+    return send_from_directory(
+        f"uploads/{username}/{project_id}", filename
+    )
+
+
+@app.route("/get_samples/<media_type>/<filename>")
+def get_samples(media_type, filename):
+    # first check if user is authenticated
+    token = request.cookies.get("token")
+    if not token:
+        return "Not authorised.", 400
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return "Not authorised.", 400
+    if token["username"] == "admin":
+        return "Not authorised.", 400
+
+    if os.path.exists(f"uploads/{token['username']}/-1/{media_type}/{filename}"):
+        return send_from_directory(
+            f"uploads/{token['username']}/-1/{media_type}", filename
+        )
+    else:
+        return "The sample does not exist.", 400
 
 
 if __name__ == "__main__":

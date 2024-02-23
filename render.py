@@ -1,10 +1,18 @@
 import argparse
 import ffmpeg
 import json
-from database import removeTask
+from database import removeTask, saveVideo
 import os
+import time
+import sched
 
-# TODO: if video already exists, overwrite it
+# Create a scheduler to delete the file after 5 minutes
+s = sched.scheduler(time.time, time.sleep)
+
+
+def delete_folder(folder_path):
+    if os.path.exists(folder_path):
+        os.system("rm -r " + folder_path)
 
 
 def create_video(username, project_id):
@@ -98,7 +106,15 @@ def create_video(username, project_id):
 
     # -1 is a special project_id to indicate that the video is a preview
     if project_id != -1:
+        # Save the video to the MYSQL database, along with the JSON data
+        with open(output_file, "rb") as f:
+            video_data = f.read()
+            saveVideo(project_id, video_data, json.dumps(data))
         removeTask(project_id)
+        os.system("rm -r " + base_path)
+        # Schedule the file to be deleted after 5 minutes
+        s.enter(1800, 1, delete_folder, argument=(base_path,))
+        s.run()
 
 
 if __name__ == "__main__":
