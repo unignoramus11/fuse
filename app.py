@@ -5,6 +5,7 @@ from flask import (
     render_template,
     request,
     send_from_directory,
+    jsonify
 )
 from dotenv import dotenv_values
 import os
@@ -14,8 +15,6 @@ import database
 import json
 from render import create_video
 from threading import Thread
-
-# from tqdm import tqdm
 
 app = Flask(__name__)
 env = dotenv_values(".env")
@@ -159,7 +158,7 @@ def dashboard():
 
     # get a random image from unplash and add it to the static/pfp folder with the name as username
     # if the image already exists, don't download it again
-            
+
     if not os.path.exists("static/pfp"):
         os.makedirs("static/pfp")
 
@@ -202,7 +201,31 @@ Please use a desktop to access this feature.",
             )
         )
     user = database.getUser(token["username"])
-    return render_template("project-editor.html", name=user[2])
+
+    # Clear the uploads/username/-1 folder
+    if os.path.exists(f"uploads/{user[1]}/-1"):
+        os.system(f"rm -rf uploads/{user[1]}/-1")
+
+    # create the above folder
+    os.makedirs(f"uploads/{user[1]}/-1")
+    os.makedirs(f"uploads/{user[1]}/-1/images")
+    os.makedirs(f"uploads/{user[1]}/-1/audio")
+
+    # get all the audio files from the static/audio folder and copy them to username/-1/audio
+    for file in os.listdir(os.path.join(app.static_folder, 'audio')):
+        os.system(f"cp {os.path.join(app.static_folder, 'audio')}" +
+                  f"/{file} uploads/{user[1]}/-1/audio/{file}")
+
+    audio_files = os.listdir(os.path.join(app.static_folder, 'audio'))
+
+    return render_template("project-editor.html", name=user[2], audio_files=audio_files)
+
+
+@app.route('/get_sample_audio')
+def get_sample_audio():
+    # Send the audio files from the static/audio folder to the user
+    audio_files = os.listdir(os.path.join(app.static_folder, 'audio'))
+    return jsonify(audio_files)
 
 
 @app.route("/submit", methods=["POST"])
@@ -246,29 +269,86 @@ def submit():
     os.makedirs(f"uploads/{username}/{project_id}/images")
     os.makedirs(f"uploads/{username}/{project_id}/audio")
 
-    # now go to the uploads/username/images folder and move all the files to
+    # go to the uploads/username/images folder and copy all the files to
     # the uploads/username/project_id/images folder
     for file in os.listdir(f"uploads/{username}/images"):
-        os.rename(
-            f"uploads/{username}/images/{file}",
-            f"uploads/{username}/{project_id}/images/{file}",
-        )
-    # now go to the uploads/username/audio folder and move all the files to
+        os.system(
+            f"cp uploads/{username}/images/{file} uploads/{username}/{project_id}/images/{file}")
+    # go to the uploads/username/audio folder and copy all the files to
     # the uploads/username/project_id/audio folder
     for file in os.listdir(f"uploads/{username}/audio"):
-        os.rename(
-            f"uploads/{username}/audio/{file}",
-            f"uploads/{username}/{project_id}/audio/{file}",
-        )
-
-    # open a new thread to create the video, on render.py create_video function
-    # create_video(username, project_id)
+        os.system(
+            f"cp uploads/{username}/audio/{file} uploads/{username}/{project_id}/audio/{file}")
 
     # create a new thread to create the video
     thread = Thread(target=create_video, args=(username, str(project_id)))
     thread.start()
 
     return redirect(url_for("dashboard"))
+
+
+@app.route("/preview", methods=["POST"])
+def preview():
+    # Check if JWT exists
+    token = request.cookies.get("token")
+    if not token:
+        return "Not authorised.", 400
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return "Not authorised.", 400
+    if token["username"] == "admin":
+        return "Not authorised.", 400
+
+    user = database.getUser(token["username"])
+    username = user[1]
+
+    # get the json file as a text field sent from the above fetch request
+    project_json = request.json
+
+    project_id = -1
+
+    # If folder doesn't exist
+    if not os.path.exists("uploads"):
+        os.makedirs("uploads")
+    if not os.path.exists(f"uploads/{username}"):
+        os.makedirs(f"uploads/{username}")
+    if not os.path.exists(f"uploads/{username}/{project_id}"):
+        os.makedirs(f"uploads/{username}/{project_id}")
+    with open(f"uploads/{username}/{project_id}/project_data.json", "w") as json_file:
+        json.dump(project_json, json_file)
+
+    # get the files from the uploads/username folder and move them to
+    # the uploads/username/project_id folder
+    # move the images to uploads/username/project_id/images
+    # move the audio to uploads/username/project_id/audio
+
+    if not os.path.exists(f"uploads/{username}/{project_id}/images"):
+        os.makedirs(f"uploads/{username}/{project_id}/images")
+    if not os.path.exists(f"uploads/{username}/{project_id}/audio"):
+        os.makedirs(f"uploads/{username}/{project_id}/audio")
+
+    # go to the uploads/username/images folder and copy all the files to
+    # the uploads/username/project_id/images folder
+    print("reached our moment of truth")
+    for file in os.listdir(f"uploads/{username}/images"):
+        os.system(
+            f"cp uploads/{username}/images/{file} uploads/{username}/\"{project_id}\"/images/{file}")
+    # go to the uploads/username/audio folder and copy all the files to
+    # the uploads/username/project_id/audio folder
+    print("reached our moment of truth 2")
+    for file in os.listdir(f"uploads/{username}/audio"):
+        os.system(
+            f"cp uploads/{username}/audio/{file} uploads/{username}/\"{project_id}\"/audio/{file}")
+
+    # create a new thread to create the video
+    thread = Thread(target=create_video, args=(username, str(project_id)))
+    thread.start()
+
+    # wait for the thread to stop
+    thread.join()
+
+    return "Preview successfully rendered", 200
 
 
 @app.route("/upload_files", methods=["POST"])
@@ -446,6 +526,38 @@ def delete(username, project_id):
         os.system(f"rm -rf uploads/{username}/{project_id}")
 
     return redirect(url_for("dashboard"))
+
+
+@app.route("/get_preview")
+def get_preview():
+    # first check if user is authenticated
+    token = request.cookies.get("token")
+    if not token:
+        return "Not authorised.", 400
+    # Decode the token
+    token = jwt.decode(token, env["SECRET_KEY"], algorithms=["HS256"])
+    if not database.userExists(token["username"]):
+        return "Not authorised.", 400
+    if token["username"] == "admin":
+        return "Not authorised.", 400
+
+    user = database.getUser(token["username"])
+    username = user[1]
+
+    # send the preview video to the user, from the uploads/username/-1 folder
+    # if the video exists
+    if os.path.exists(f"uploads/{username}/-1"):
+        # get the project name
+        with open(f"uploads/{username}/-1/project_data.json") as json_file:
+            project_json = json.load(json_file)
+            project_name = project_json["name"]
+            video_format = project_json["format"]
+
+        return send_from_directory(
+            f"uploads/{username}/-1", f"{project_name}.{video_format}"
+        )
+    else:
+        return "The preview does not exist.", 400
 
 
 if __name__ == "__main__":

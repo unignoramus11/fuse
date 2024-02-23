@@ -22,6 +22,10 @@ def createDatabase():
     mycursor.execute(
         "INSERT IGNORE INTO users (username, password) VALUES ('admin', 'admin')"
     )
+    # mycursor.execute(
+    #     "CREATE TABLE IF NOT EXISTS files (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), filename VARCHAR(255), file BLOB, FOREIGN KEY (username ) REFERENCES users(username))"
+    # )
+
     mydb.commit()
     mycursor.close()
     mydb.close()
@@ -94,6 +98,34 @@ def getAdminView():
     mydb.close()
 
     return result
+
+
+# def getFile(username, filename):
+#     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+#     mycursor = mydb.cursor()
+#     mycursor.execute("USE fuse")
+#     mycursor.execute(
+#         "SELECT * FROM files WHERE username = %(username)s AND filename = %(filename)s",
+#         {"username": username, "filename": filename},
+#     )
+#     result = mycursor.fetchone()
+#     mycursor.close()
+#     mydb.close()
+
+#     return result[3]
+
+
+# def saveFile(username, filename, file):
+#     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+#     mycursor = mydb.cursor()
+#     mycursor.execute("USE fuse")
+#     mycursor.execute(
+#         "INSERT INTO files (username, filename, file) VALUES (%(username)s, %(filename)s, %(file)s)",
+#         {"username": username, "filename": filename, "file": file},
+#     )
+#     mydb.commit()
+#     mycursor.close()
+#     mydb.close()
 
 
 def getUser(username):
@@ -241,10 +273,11 @@ def getStats():
     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
     mycursor = mydb.cursor()
     mycursor.execute("USE fuse")
-    mycursor.execute("SELECT COUNT(*) FROM users")
-    n_users = mycursor.fetchone()[0]
-    mycursor.execute("SELECT COUNT(*) FROM projects")
+    # get number of projects as sum of the values in the column noOfProjects
+    mycursor.execute("SELECT SUM(noOfProjects) FROM users")
     n_projects = mycursor.fetchone()[0]
+    mycursor.execute("SELECT COUNT(*) FROM users WHERE username != 'admin'")
+    n_users = mycursor.fetchone()[0]
     mycursor.close()
     mydb.close()
 

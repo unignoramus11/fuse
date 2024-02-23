@@ -467,7 +467,7 @@
           class="sub-container stats word"
           style="padding: min(100px, 0.5vw); text-wrap: nowrap"
         >
-          <div style="color: #ff4255; font-size: 4em">{{ n_projects }}</div>
+          <div style="color: #ff4255; font-size: 4em" id="n_projects">{{ n_projects }}</div>
           <div style="text-align: center">Creations</div>
         </div>
         <div
@@ -524,6 +524,7 @@
 
       // Increase the stats counters
       let stats = document.querySelectorAll(".stats div");
+      let n_projects = document.getElementById("n_projects");
 
       // Create an observer
       let observer = new IntersectionObserver((entries) => {
@@ -532,10 +533,11 @@
             let stat = entry.target;
             let count = 0;
             let target = +stat.innerText;
+            console.log(target);
             let interval = target / 41;
             let increment = () => {
               count += interval;
-              if (count < target) {
+              if (count < target+1) {
                 stat.innerText = Math.floor(count);
               } else {
                 observer.unobserve(stat); // Stop observing when target is reached

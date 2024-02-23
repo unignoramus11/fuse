@@ -2,6 +2,9 @@ import argparse
 import ffmpeg
 import json
 from database import removeTask
+import os
+
+# TODO: if video already exists, overwrite it
 
 
 def create_video(username, project_id):
@@ -14,6 +17,9 @@ def create_video(username, project_id):
         data = json.load(f)
 
     output_file = base_path + data["name"] + "." + data["format"]
+
+    if os.path.exists(output_file):
+        os.remove(output_file)
 
     # Extract video parameters
     FPS = 30
@@ -89,7 +95,10 @@ def create_video(username, project_id):
         video = ffmpeg.output(video, output_file, f=data["format"], r=FPS)
 
     ffmpeg.run(video)
-    removeTask(project_id)
+
+    # -1 is a special project_id to indicate that the video is a preview
+    if project_id != -1:
+        removeTask(project_id)
 
 
 if __name__ == "__main__":
