@@ -326,6 +326,10 @@ def preview():
         os.makedirs("uploads")
     if not os.path.exists(f"uploads/{username}"):
         os.makedirs(f"uploads/{username}")
+    if not os.path.exists(f"uploads/{username}/images"):
+        os.makedirs(f"uploads/{username}/images")
+    if not os.path.exists(f"uploads/{username}/audio"):
+        os.makedirs(f"uploads/{username}/audio")
     if not os.path.exists(f"uploads/{username}/{project_id}"):
         os.makedirs(f"uploads/{username}/{project_id}")
     with open(f"uploads/{username}/{project_id}/project_data.json", "w") as json_file:
@@ -397,10 +401,12 @@ def upload_files():
             os.makedirs(f"uploads/{username}/images")
             os.makedirs(f"uploads/{username}/audio")
 
-        # replace all whitespace with underscores
-        # also do this for file names with multiple dots
-        # first get the filename with all dots replaced with underscores
-        fname = file.filename.replace(" ", "_")
+        # do equivalent of file.name.replace(/[^a-zA-Z0-9_.]/g, '')
+        fname = "".join(
+            [c for c in file.filename if c.isalnum() or c in ["_", "."]]
+        )
+        fname = fname.replace(".", "_")
+        fname = fname[::-1].replace("_", ".", 1)[::-1]
         # Check the MIME type of the file
         if file.content_type.startswith("image/"):
             file.save(f"uploads/{username}/images/" + fname)

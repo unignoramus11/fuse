@@ -1,5 +1,4 @@
 import json
-import re
 from dotenv import dotenv_values
 import mysql.connector
 
@@ -285,11 +284,23 @@ def removeTask(project_id):
     mydb.close()
 
 
+def removeVideo(project_id):
+    mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
+    mycursor = mydb.cursor()
+    mycursor.execute("USE fuse")
+    mycursor.execute("DELETE FROM videos WHERE project_id = %(project_id)s", {
+        "project_id": project_id})
+    mydb.commit()
+    mycursor.close()
+    mydb.close()
+
+
 def deleteProject(project_id):
     mydb = mysql.connector.connect(user="root", password=env["PASSWORD"])
     mycursor = mydb.cursor()
     mycursor.execute("USE fuse")
     removeTask(project_id)
+    removeVideo(project_id)
     mycursor.execute("DELETE FROM projects WHERE id = %(project_id)s", {
                      "project_id": project_id})
     mydb.commit()
@@ -355,7 +366,7 @@ def getThumbnail(project_id):
 
     if result is None:
         return None
-    
+
     result = result[0]
 
     result = json.loads(result)

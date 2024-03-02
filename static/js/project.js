@@ -1,5 +1,6 @@
 var toSubmit = false; // Flag to track if the form is ready to be submitted
 var activeUploads = 0; // Number of active uploads
+var waitingForPreview = 0; // Number of active previews
 
 // Set a random project name with an adjective and an animal
 let projectInput = document.getElementById("projectName");
@@ -91,7 +92,7 @@ function displayFiles(files) {
       img.src = URL.createObjectURL(file);
       img.style.width = "100%";
 
-      img.alt = file.name;
+      img.alt = file.name.replace(/[^a-zA-Z0-9_.]/g, "");
 
       ((img, file) => {
         let timelineImageContainer;
@@ -112,8 +113,8 @@ function displayFiles(files) {
 
             timelineImageContainer.innerHTML = `
               <form id="${file.name.replace(
-                /\s/g,
-                "_"
+                /[^a-zA-Z0-9_.]/g,
+                ""
               )}_form" class="timeline-image-modifiers">
                   <button type="button" class="leftArrow">
                     <i class="fa-solid fa-arrow-left"></i>
@@ -269,12 +270,19 @@ function displayFiles(files) {
 
       var audio = document.createElement("audio");
       audio.src = URL.createObjectURL(file);
-      audio.alt = file.name;
+      audio.alt = file.name.replace(/[^a-zA-Z0-9_.]/g, "");
 
       // Show the file name beside the audio
       var audioName = document.createElement("p");
       // set the text of the p element to the file name after replacing _ with space
-      audioName.textContent = file.name.replace(/\_/g, " ");
+      // also ensure length of the file name is less than 20 characters
+      audioName.textContent =
+        file.name.replace(/[^a-zA-Z0-9_.]/g, "").length > 20
+          ? file.name
+              .replace(/[^a-zA-Z0-9_.]/g, "")
+              .substring(0, 20)
+              .replace(/_/g, " ") + "..."
+          : file.name.replace(/[^a-zA-Z0-9_.]/g, "").replace(/_/g, " ");
       audioItem.appendChild(audioName);
 
       // Custom audio controls
@@ -332,16 +340,17 @@ function displayFiles(files) {
               audItem.style.width = "50vw";
               audItem.innerHTML = `
           <form id="${file.name.replace(
-            /\s/g,
-            "_"
+            /[^a-zA-Z0-9_.]/g,
+            ""
           )}_form" class="timeline-audio-modifiers">
             <button type="button" class="leftArrow">
               <i class="fa-solid fa-arrow-left"></i>
             </button>
             <input type="text" class="file-name" value="${
-              file.name.length > 20
-                ? file.name.substring(0, 20) + "..."
-                : file.name
+              file.name.replace(/[^a-zA-Z0-9_.]/g, "").length > 20
+                ? file.name.replace(/[^a-zA-Z0-9_.]/g, "").substring(0, 20) +
+                  "..."
+                : file.name.replace(/[^a-zA-Z0-9_.]/g, "")
             }" readonly />
             <input
               type="number"
@@ -382,6 +391,7 @@ function displayFiles(files) {
                 if (previous) {
                   audItem.parentNode.insertBefore(audItem, previous);
                 }
+                previewProject();
               });
 
               // add a right arrow click event listener, which exchanges the audio element with the one after it
@@ -391,6 +401,7 @@ function displayFiles(files) {
                 if (next) {
                   audItem.parentNode.insertBefore(next, audItem);
                 }
+                previewProject();
               });
               audioList.appendChild(audItem);
             } else {
@@ -541,10 +552,13 @@ async function previewProject() {
   document.getElementById("playButton").innerHTML =
     '<i class="fas fa-spinner fa-spin" style="color: white;"></i>';
 
-  // Wait until activeUploads is zero
-  while (activeUploads !== 0) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  // Wait until activeUploads is zero and all previous renders are done
+  while (activeUploads > 0 || waitingForPreview > 0) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
+
+  // increment the waitingForPreview flag
+  waitingForPreview++;
 
   var projectName =
     projectInput.value == "" ? projectInput.placeholder : projectInput.value;
@@ -613,6 +627,7 @@ async function previewProject() {
       alert("Error: " + response.statusText);
     } else {
       getPreview();
+      waitingForPreview--;
     }
   });
 }
@@ -875,9 +890,11 @@ function getPreview() {
         video.currentTime = 0;
         seekBar.value = 0;
         seek();
-        // set the content of play button back to play icon
-        document.getElementById("playButton").innerHTML =
-          '<i class="fas fa-play" style="color: white;"></i>';
+        // set the content of play button back to play icon, if all previous renders are done
+        if (waitingForPreview == 0) {
+          document.getElementById("playButton").innerHTML =
+            '<i class="fas fa-play" style="color: white;"></i>';
+        }
       };
     });
 }
