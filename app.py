@@ -137,14 +137,6 @@ def dashboard():
     for i in range(len(projects)):
         project_id = projects[i][0]
         username = user[1]
-        # if os.path.exists(f"uploads/{username}/{project_id}/thumbnail"):
-        #     images = os.listdir(f"uploads/{username}/{project_id}/thumbnail")
-        #     if images:
-        #         projects[i] = projects[i] + (images[0],)
-        #     else:
-        #         projects[i] = projects[i] + ("",)
-        # else:
-        #     projects[i] = projects[i] + ("",)
 
         thumbnail = database.getThumbnail(project_id)
         if thumbnail:
@@ -212,7 +204,7 @@ def create():
             url_for(
                 "error",
                 error="This feature is not available on mobile devices. \
-Please use a desktop to access this feature.",
+Please use a desktop or desktop mode to access this feature.",
             )
         )
     user = database.getUser(token["username"])
