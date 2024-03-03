@@ -2,6 +2,9 @@ var toSubmit = false; // Flag to track if the form is ready to be submitted
 var activeUploads = 0; // Number of active uploads
 var waitingForPreview = 0; // Number of active previews
 
+let sampleAudioObtained = false;
+let sampleImageObtained = false;
+
 // Set a random project name with an adjective and an animal
 let projectInput = document.getElementById("projectName");
 projectInput.placeholder = "Loading...";
@@ -690,11 +693,25 @@ playButton.addEventListener("click", function () {
   if (video.paused) {
     video.play();
     // Change it into play button
-    playButton.innerHTML = '<i class="fas fa-pause" style="color: white;"></i>';
+    if (
+      activeUploads == 0 &&
+      waitingForPreview == 0 &&
+      sampleAudioObtained &&
+      sampleImageObtained
+    )
+      playButton.innerHTML =
+        '<i class="fas fa-pause" style="color: white;"></i>';
   } else {
     video.pause();
     // Change it into pause button
-    playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+    if (
+      activeUploads == 0 &&
+      waitingForPreview == 0 &&
+      sampleAudioObtained &&
+      sampleImageObtained
+    )
+      playButton.innerHTML =
+        '<i class="fas fa-play" style="color: white;"></i>';
   }
 });
 
@@ -706,7 +723,13 @@ toEndButton.addEventListener("click", function () {
   video.currentTime = video.duration;
   video.pause();
   // Change it into pause button
-  playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+  if (
+    activeUploads == 0 &&
+    waitingForPreview == 0 &&
+    sampleAudioObtained &&
+    sampleImageObtained
+  )
+    playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
 });
 
 rewindButton.addEventListener("click", function () {
@@ -732,7 +755,13 @@ function seek() {
 
 // If video ends then change the play button to play
 video.addEventListener("ended", function () {
-  playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
+  if (
+    activeUploads == 0 &&
+    waitingForPreview == 0 &&
+    sampleAudioObtained &&
+    sampleImageObtained
+  )
+    playButton.innerHTML = '<i class="fas fa-play" style="color: white;"></i>';
 });
 
 generateRuler();
@@ -891,9 +920,18 @@ function getPreview() {
         seekBar.value = 0;
         seek();
         // set the content of play button back to play icon, if all previous renders are done
-        if (waitingForPreview == 0) {
-          document.getElementById("playButton").innerHTML =
-            '<i class="fas fa-play" style="color: white;"></i>';
+        if (
+          waitingForPreview == 0 &&
+          activeUploads == 0 &&
+          sampleAudioObtained &&
+          sampleImageObtained
+        ) {
+          if (video.paused) {
+            document.getElementById("playButton").innerHTML =
+              '<i class="fas fa-play" style="color: white;"></i>';
+          } else
+            document.getElementById("playButton").innerHTML =
+              '<i class="fas fa-pause" style="color: white;"></i>';
         }
       };
     });
@@ -912,9 +950,6 @@ window.onload = () => {
   let audioFiles = [];
   let imageFiles = [];
 
-  let sampleAudioObtained = false;
-  let sampleImageObtained = false;
-
   // set the cotent of the play button as a spinner
   document.getElementById("playButton").innerHTML =
     '<i class="fas fa-spinner fa-spin" style="color: white;"></i>';
@@ -928,10 +963,19 @@ window.onload = () => {
           if (audioFiles.length === audioNames.length) {
             displayFiles(audioFiles);
             sampleAudioObtained = true;
-            if (sampleAudioObtained && sampleImageObtained) {
+          }
+          if (
+            sampleAudioObtained &&
+            (sampleImageObtained || imageFiles.length === 0) &&
+            activeUploads == 0 &&
+            waitingForPreview == 0
+          ) {
+            if (video.paused) {
               document.getElementById("playButton").innerHTML =
                 '<i class="fas fa-play" style="color: white;"></i>';
-            }
+            } else
+              document.getElementById("playButton").innerHTML =
+                '<i class="fas fa-pause" style="color: white;"></i>';
           }
         });
     });
@@ -947,10 +991,19 @@ window.onload = () => {
           if (imageFiles.length === imageNames.length) {
             displayFiles(imageFiles);
             sampleImageObtained = true;
-            if (sampleAudioObtained && sampleImageObtained) {
+          }
+          if (
+            (sampleAudioObtained || audioFiles.length === 0) &&
+            sampleImageObtained &&
+            activeUploads == 0 &&
+            waitingForPreview == 0
+          ) {
+            if (video.paused) {
               document.getElementById("playButton").innerHTML =
                 '<i class="fas fa-play" style="color: white;"></i>';
-            }
+            } else
+              document.getElementById("playButton").innerHTML =
+                '<i class="fas fa-pause" style="color: white;"></i>';
           }
         });
     });

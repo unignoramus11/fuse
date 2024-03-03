@@ -96,11 +96,12 @@ def create_video(username, project_id):
             audio_stream,
             output_file,
             shortest=None,
-            f=data["format"],
+            f="matroska" if data["format"] == "mkv" else data["format"],
             r=FPS
         )
     else:
-        video = ffmpeg.output(video, output_file, f=data["format"], r=FPS)
+        video = ffmpeg.output(
+            video, output_file, f="matroska" if data["format"] == "mkv" else data["format"], r=FPS)
 
     ffmpeg.run(video)
 
