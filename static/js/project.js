@@ -912,6 +912,13 @@ window.onload = () => {
   let audioFiles = [];
   let imageFiles = [];
 
+  let sampleAudioObtained = false;
+  let sampleImageObtained = false;
+
+  // set the cotent of the play button as a spinner
+  document.getElementById("playButton").innerHTML =
+    '<i class="fas fa-spinner fa-spin" style="color: white;"></i>';
+
   if (audioNames.length != 0 && audioNames[0] != "") {
     audioNames.forEach((name) => {
       fetch(`/get_samples/audio/${name}`)
@@ -920,6 +927,11 @@ window.onload = () => {
           audioFiles.push(new File([blob], name, { type: "audio/mpeg" }));
           if (audioFiles.length === audioNames.length) {
             displayFiles(audioFiles);
+            sampleAudioObtained = true;
+            if (sampleAudioObtained && sampleImageObtained) {
+              document.getElementById("playButton").innerHTML =
+                '<i class="fas fa-play" style="color: white;"></i>';
+            }
           }
         });
     });
@@ -934,6 +946,11 @@ window.onload = () => {
           imageFiles.push(new File([blob], name, { type: "image/png" }));
           if (imageFiles.length === imageNames.length) {
             displayFiles(imageFiles);
+            sampleImageObtained = true;
+            if (sampleAudioObtained && sampleImageObtained) {
+              document.getElementById("playButton").innerHTML =
+                '<i class="fas fa-play" style="color: white;"></i>';
+            }
           }
         });
     });
