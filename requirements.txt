@@ -12,6 +12,7 @@ colorama==0.4.6
 decorator==4.4.2
 ffmpeg-python==0.2.0
 Flask==3.0.1
+Flask-SQLAlchemy==3.1.1
 future==0.18.3
 gunicorn==21.2.0
 idna==3.6
@@ -27,13 +28,16 @@ packaging==23.2
 pillow==10.2.0
 proglog==0.1.10
 prompt-toolkit==3.0.43
+psycopg2-binary==2.9.9
 PyJWT==2.8.0
 python-dateutil==2.8.2
 python-dotenv==1.0.1
 requests==2.31.0
 setuptools==69.0.3
 six==1.16.0
+SQLAlchemy==2.0.28
 tqdm==4.66.2
+typing_extensions==4.10.0
 tzdata==2024.1
 urllib3==2.2.0
 vine==5.1.0

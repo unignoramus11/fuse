@@ -1,5 +1,4 @@
 from flask import (
-    Flask,
     redirect,
     url_for,
     render_template,
@@ -14,8 +13,8 @@ import database
 import json
 from render import create_video
 from threading import Thread
+from flask_commons import app
 
-app = Flask(__name__)
 env = dotenv_values(".env")
 
 
