@@ -13,6 +13,7 @@ decorator==4.4.2
 ffmpeg-python==0.2.0
 Flask==3.0.1
 future==0.18.3
+gunicorn==21.2.0
 idna==3.6
 imageio==2.33.1
 imageio-ffmpeg==0.4.9
@@ -22,6 +23,7 @@ kombu==5.3.5
 MarkupSafe==2.1.5
 mysql-connector-python==8.3.0
 numpy==1.26.4
+packaging==23.2
 pillow==10.2.0
 proglog==0.1.10
 prompt-toolkit==3.0.43
