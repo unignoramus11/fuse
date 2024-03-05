@@ -9,7 +9,8 @@ global db_pool
 db_pool = psycopg2.pool.SimpleConnectionPool(
     1,  # minconn: start with 1 connection
     10000,  # maxconn: max 10000 connections
-    env["DB_URL"]
+    env["DB_URL"],
+    connect_timeout=10  # timeout in seconds
 )
 
 
