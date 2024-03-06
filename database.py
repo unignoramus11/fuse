@@ -24,16 +24,6 @@ def return_conn(conn):
     db_pool.putconn(conn)
 
 
-def some_function():
-    # Now in your functions, get a connection from the pool and return it when done
-    conn = get_conn()
-    try:
-        # Use the connection...
-        pass
-    finally:
-        return_conn(conn)
-
-
 def createDatabase():
     mydb = get_conn()
     try:
