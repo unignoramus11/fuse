@@ -456,8 +456,15 @@ function exportProject() {
     var exportFormat = formatInput.value;
     var exportResolution = resolutionInput.value;
     var height, width;
-
-    if (exportResolution == "360p") {
+    if (exportResolution == "144p") {
+      height = 144;
+      width = 256;
+    } 
+    else if (exportResolution == "240p") {
+      height = 240;
+      width = 426;
+    } 
+    else if (exportResolution == "360p") {
       height = 360;
       width = 640;
     } else if (exportResolution == "480p") {

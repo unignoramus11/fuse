@@ -236,7 +236,7 @@ Please use a desktop or desktop mode to access this feature.",
     images = ','.join(os.listdir(f"uploads/{user[1]}/-1/images"))
     audio = ','.join(os.listdir(f"uploads/{user[1]}/-1/audio"))
 
-    return render_template("project-editor.html", name=user[2], images=images, audio=audio)
+    return render_template("project-editor.html", name=user[2], images=images, audio=audio, server_bad=(env["SERVER_BAD"] == "YES"))
 
 
 @app.route("/submit", methods=["POST"])

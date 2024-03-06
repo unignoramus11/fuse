@@ -5,6 +5,9 @@ from database import removeTask, saveVideo
 import os
 import time
 import sched
+from dotenv import dotenv_values
+
+env = dotenv_values(".env")
 
 # Create a scheduler to delete the file after 5 minutes
 s = sched.scheduler(time.time, time.sleep)
@@ -31,8 +34,8 @@ def create_video(username, project_id):
 
     # Extract video parameters
     FPS = 30
-    height = data["height"]
-    width = data["width"]
+    height = 144 if project_id == "-1" else data["height"]
+    width = 256 if project_id == "-1" else data["width"]
 
     # Extract image and audio information
     images = data["images"]
@@ -44,7 +47,7 @@ def create_video(username, project_id):
     # Create input streams for each image with respective durations
     for idx, image_info in enumerate(images):
         file = base_path + "images/" + image_info["file"]
-        duration_s = image_info["duration_ms"] / 1000
+        duration_s = image_info["duration_ms"] / 1000 - 1
 
         # Apply loop filter with specified duration and number of frames
         # Calculate the number of frames to loop
@@ -106,7 +109,7 @@ def create_video(username, project_id):
     ffmpeg.run(video)
 
     # -1 is a special project_id to indicate that the video is a preview
-    if project_id != -1:
+    if project_id != "-1":
         # Save the video to the MYSQL database, along with the JSON data
         with open(output_file, "rb") as f:
             video_data = f.read()
