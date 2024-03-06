@@ -169,8 +169,7 @@ if env["SERVER_BAD"] == "YES":
             # if file with the same name exists, add a number to the end of the filename and try again
             i = 1
             while getFile(username, filename):
-                filename = f"{filename.split('.')[0]}_{i}.{
-                    filename.split('.')[1]}"
+                filename = f"{filename.split('.')[0]}_{i}.{filename.split('.')[1]}"
                 i += 1
 
             mycursor.execute(
