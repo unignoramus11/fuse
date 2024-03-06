@@ -911,9 +911,6 @@ function getPreview() {
   // fetch the video from the server
   fetch("/get_preview")
     .then((response) => {
-      if (!response.ok) {
-        alert("Error: " + response.statusText);
-      }
       return response.blob();
     })
     .then((blob) => {
