@@ -18,6 +18,13 @@ from flask_commons import app
 env = dotenv_values(".env")
 
 
+def processJSON(jsonOBJ):
+    [imageFile.update({"file": imageFile["file"].replace('.', '_')[
+                      ::-1].replace('_', '.', 1)[::-1]}) for imageFile in jsonOBJ["images"]]
+    [audioFile.update({"file": audioFile["file"].replace('.', '_')[
+                      ::-1].replace('_', '.', 1)[::-1]}) for audioFile in jsonOBJ["audio"]]
+
+
 @app.route("/", methods=["POST", "GET"])
 def home():
     # Check if JWT exists
@@ -257,6 +264,7 @@ def submit():
 
     # get the json file as a text field sent from the form
     project_json = json.loads(request.form.get("json"))
+    processJSON(project_json)
 
     project_id = database.createProject(
         project_json["name"], username
@@ -309,6 +317,7 @@ def preview():
 
     # get the json file as a text field sent from the above fetch request
     project_json = request.json
+    processJSON(project_json)
 
     project_id = -1
 
