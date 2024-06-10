@@ -169,7 +169,7 @@ def dashboard():
         else:
             projects[i] = projects[i] + (True,)
 
-    # get a random image from unplash and add it to the static/pfp folder with the name as username
+    # get a random image from Lorem Picsum and add it to the static/pfp folder with the name as username
     # if the image already exists, don't download it again
 
     if not os.path.exists("static/pfp"):
@@ -180,7 +180,7 @@ def dashboard():
         from PIL import Image
         from io import BytesIO
 
-        response = requests.get("https://source.unsplash.com/random/200x200")
+        response = requests.get("https://picsum.photos/200")
         img = Image.open(BytesIO(response.content))
         img.save(f"static/pfp/{user[1]}.jpg")
 
